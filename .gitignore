@@ -1,0 +1,13 @@
+node_modules/
+dist/
+publish/
+.astro/
+.DS_Store
+*.log
+npm-debug.log*
+
+# Mirrored from images/ by scripts/build-data.mjs — images/ is the source of truth.
+public/images/
+
+# Excel lock files
+~$*.xlsx

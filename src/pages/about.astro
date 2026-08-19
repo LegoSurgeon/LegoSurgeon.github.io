@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { projects, projectCount, populatedCount, AUTHOR, SITE_TITLE } from '../lib/projects.js';
+import { url } from '../lib/url.js';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PLACEHOLDER COPY — edit these three fields with Nicholas's own words.
+// Everything below them is generated from the workbook and needs no editing.
+// ─────────────────────────────────────────────────────────────────────────────
+const bio = [
+  `${AUTHOR} designs and builds mechanical and mechatronic systems — from FIRST Tech
+   Challenge robotics drivetrains to custom tooling, enclosures, and embedded electronics.`,
+  `This portfolio documents each project the same way: what it is, why it was made,
+   what was designed, the central engineering challenge, and what the work taught.`,
+];
+const contact = [
+  // { label: 'Email',    value: 'you@example.com', href: 'mailto:you@example.com', icon: 'mail' },
+  // { label: 'LinkedIn', value: 'linkedin.com/in/…', href: 'https://…',            icon: 'linkedin' },
+];
+// ─────────────────────────────────────────────────────────────────────────────
+
+const disciplines = [...new Set(projects.flatMap((p) => p.disciplines))].sort((a, b) => a.localeCompare(b));
+const tools = [...new Set(projects.flatMap((p) => p.tools))].sort((a, b) => a.localeCompare(b));
+
+// The workbook's own field labels, so the About page describes the real format.
+const method = [
+  { label: 'What it is', text: 'The system itself, described plainly.' },
+  { label: 'Why I made it', text: 'The motivation and the problem worth solving.' },
+  { label: 'What I designed', text: 'The specific scope of my own work.' },
+  { label: 'Key engineering challenge', text: 'The constraint that shaped every decision.' },
+  { label: 'What I learned', text: 'What the project changed about how I work.' },
+];
+---
+<BaseLayout
+  title={`About — ${SITE_TITLE}`}
+  description={`About ${AUTHOR} and how the projects in this engineering portfolio are documented.`}
+>
+  <div class="min-h-screen bg-slate-900">
+
+    <section class="relative pt-36 pb-14 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-slate-900 to-blue-900/30"></div>
+      <div class="relative z-10 container mx-auto px-4">
+        <div class="max-w-3xl mx-auto text-center">
+          <div class="inline-flex items-center space-x-2 bg-purple-500/15 border border-purple-400/40 rounded-full px-5 py-2 mb-6">
+            <Icon name="user" size={16} class="text-purple-300" />
+            <span class="text-purple-200 text-sm font-semibold tracking-wide uppercase">The Author</span>
+          </div>
+          <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+            <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              {AUTHOR}
+            </span>
+          </h1>
+          {bio.map((para) => (
+            <p class="text-base sm:text-lg text-gray-300 leading-relaxed mb-4">{para}</p>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-slate-950 border-y border-white/10 py-12">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto grid grid-cols-3 gap-6 text-center">
+          <div>
+            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{projectCount}</p>
+            <p class="text-gray-400 text-xs sm:text-sm mt-2">Projects</p>
+          </div>
+          <div>
+            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{populatedCount}</p>
+            <p class="text-gray-400 text-xs sm:text-sm mt-2">Documented</p>
+          </div>
+          <div>
+            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{disciplines.length}</p>
+            <p class="text-gray-400 text-xs sm:text-sm mt-2">Disciplines</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-slate-900 py-16">
+      <div class="container mx-auto px-4">
+        <div class="max-w-3xl mx-auto">
+          <h2 class="text-3xl sm:text-4xl font-bold text-white mb-4">How Each Project Is Documented</h2>
+          <p class="text-gray-400 mb-10">
+            Every project answers the same five questions, so any two can be compared directly.
+          </p>
+          <div class="space-y-6">
+            {method.map((m, i) => (
+              <div class="flex gap-5">
+                <span class="font-mono text-sm font-bold text-purple-400/70 pt-1 flex-shrink-0">0{i + 1}</span>
+                <div class="border-l-2 border-purple-500/30 pl-5">
+                  <h3 class="text-lg font-bold text-white mb-1">{m.label}</h3>
+                  <p class="text-gray-400 leading-relaxed">{m.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {(disciplines.length > 0 || tools.length > 0) && (
+      <section class="bg-slate-950 border-t border-white/10 py-16">
+        <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+            {disciplines.length > 0 && (
+              <div>
+                <h2 class="flex items-center gap-2 text-xl font-bold text-white mb-5">
+                  <Icon name="compass" size={18} class="text-purple-400" />
+                  Disciplines
+                </h2>
+                <ul class="flex flex-wrap gap-2">
+                  {disciplines.map((d) => (
+                    <li class="text-sm px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-400/25 text-purple-200">{d}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {tools.length > 0 && (
+              <div>
+                <h2 class="flex items-center gap-2 text-xl font-bold text-white mb-5">
+                  <Icon name="wrench" size={18} class="text-blue-400" />
+                  Tools
+                </h2>
+                <ul class="flex flex-wrap gap-2">
+                  {tools.map((t) => (
+                    <li class="text-sm px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-400/25 text-blue-200">{t}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section class="bg-slate-900 py-16 border-t border-white/10">
+      <div class="container mx-auto px-4">
+        <div class="max-w-2xl mx-auto text-center bg-gradient-to-br from-purple-900/30 to-blue-900/30 rounded-2xl p-10 border border-purple-500/30">
+          <h2 class="text-2xl sm:text-3xl font-bold text-white mb-4">Explore the Work</h2>
+          <p class="text-gray-300 mb-8">
+            {projectCount} projects spanning robotics, mechatronics, tooling, and mechanical design.
+          </p>
+
+          {contact.length > 0 && (
+            <ul class="flex flex-wrap justify-center gap-4 mb-8">
+              {contact.map((c) => (
+                <li>
+                  <a href={c.href} class="inline-flex items-center gap-2 text-purple-300 hover:text-purple-200 text-sm transition-colors">
+                    <Icon name={c.icon} size={16} />
+                    {c.value}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <a href={url('/projects/')}
+            class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg">
+            <span>Browse All Projects</span>
+            <Icon name="arrow-right" size={20} />
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</BaseLayout>

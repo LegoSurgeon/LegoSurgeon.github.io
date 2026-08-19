@@ -1,0 +1,465 @@
+---
+import Icon from './Icon.astro';
+import { projects, projectCode, projectTitle, projectHref, searchIndex, SITE_TITLE } from '../lib/projects.js';
+import { url, isActive } from '../lib/url.js';
+
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { name: 'Home', path: url('/') },
+  { name: 'About', path: url('/about/') },
+];
+
+// Flat list — every sheet, sub-pages included, in workbook order.
+const projectLinks = projects.map((p) => ({
+  code: projectCode(p),
+  name: p.short,
+  title: projectTitle(p),
+  path: projectHref(p),
+  populated: p.populated,
+  isVariant: Boolean(p.parentSlug),
+}));
+
+const projectsPath = url('/projects/');
+const index = searchIndex();
+---
+
+<header class="fixed top-0 left-0 right-0 z-[200] pt-3">
+  <div class="container mx-auto px-4">
+    <nav class="bg-white/5 backdrop-blur-2xl border border-white/15 rounded-xl px-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] h-[52px] flex items-center">
+      <div class="flex items-center justify-between w-full gap-3">
+
+        <!-- Wordmark -->
+        <a href={url('/')} class="flex items-center group relative z-10 flex-shrink-0 min-w-0" aria-label={SITE_TITLE}>
+          <span class="text-base sm:text-lg font-bold tracking-tight truncate bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            The Engineering Portfolio
+          </span>
+        </a>
+
+        <div class="flex items-center gap-1 relative z-10 flex-shrink-0">
+
+          <!-- Desktop nav -->
+          <div class="hidden lg:flex items-center gap-2">
+            <a href={url('/')}
+              class={`nav-desktop-link px-3 py-2 rounded-lg text-base font-medium transition-all duration-200 ${isActive(currentPath, url('/')) ? 'nav-desktop-link--active bg-white/[0.08]' : ''}`}>
+              <span class="nav-grad-text">Home</span>
+            </a>
+
+            <!-- Projects — hover dropdown, flat list -->
+            <div class="projects-desktop-parent relative">
+              <a href={projectsPath}
+                class={`nav-desktop-link flex items-center gap-1.5 px-3 py-2 rounded-lg text-base font-medium transition-all duration-200 ${isActive(currentPath, projectsPath) ? 'nav-desktop-link--active bg-white/[0.08]' : ''}`}>
+                <span class="nav-grad-text">Projects</span>
+                <Icon name="chevron-down" size={13} class="projects-desktop-chevron text-gray-500 transition-transform duration-200 flex-shrink-0" />
+              </a>
+
+              <!-- pt-2 bridges the gap so the hover never drops mid-travel -->
+              <div class="projects-desktop-dropdown absolute top-full right-0 pt-2">
+                <div class="w-[24rem] bg-slate-950 border border-white/12 rounded-2xl shadow-2xl overflow-hidden">
+                  <div class="px-3 py-3 max-h-[70vh] overflow-y-auto">
+                    {projectLinks.map((link) => (
+                      <a href={link.path} title={link.title}
+                        class={`flex items-baseline gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors hover:bg-white/5 ${isActive(currentPath, link.path) ? 'bg-white/[0.06] text-white' : 'text-gray-400 hover:text-purple-300'}`}>
+                        <span class="font-mono text-xs font-semibold w-[3ch] flex-shrink-0 text-purple-400/70">{link.code}</span>
+                        <span class={`flex-1 ${link.isVariant ? 'pl-3 border-l border-white/10' : ''}`}>{link.name}</span>
+                        {!link.populated && <span class="text-[10px] uppercase tracking-wide text-gray-600 flex-shrink-0">Soon</span>}
+                      </a>
+                    ))}
+                  </div>
+                  <a href={projectsPath}
+                    class="flex items-center justify-between gap-2 px-6 py-3 border-t border-white/10 text-sm font-semibold text-white hover:bg-white/5 transition-colors">
+                    <span>View all projects</span>
+                    <Icon name="arrow-right" size={16} class="text-purple-400" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <a href={url('/about/')}
+              class={`nav-desktop-link px-3 py-2 rounded-lg text-base font-medium transition-all duration-200 ${isActive(currentPath, url('/about/')) ? 'nav-desktop-link--active bg-white/[0.08]' : ''}`}>
+              <span class="nav-grad-text">About</span>
+            </a>
+
+            <div class="w-px h-5 bg-white/10 mx-1 flex-shrink-0"></div>
+          </div>
+
+          <!-- Search (desktop; mobile gets it inside the overlay) -->
+          <button id="search-open" type="button" aria-label="Search projects"
+            class="hidden lg:flex p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-all duration-300">
+            <Icon name="search" size={20} />
+          </button>
+
+          <!-- Hamburger (mobile) -->
+          <button id="nav-toggle" type="button" aria-label="Navigation menu" aria-expanded="false"
+            class="lg:hidden p-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 transition-colors duration-300">
+            <div id="hamburger-icon" style="width:20px;height:14px;position:relative;">
+              <span class="ham-line" style="top:0px;"></span>
+              <span class="ham-line" style="top:6px;"></span>
+              <span class="ham-line" style="top:12px;"></span>
+            </div>
+          </button>
+
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- Full-screen mobile nav — slides down from the top -->
+<div id="nav-overlay"
+  class="fixed inset-0 z-[190] bg-slate-950"
+  style="transform:translateY(-100%);transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);pointer-events:none;"
+  aria-hidden="true">
+
+  <div class="container mx-auto px-4 h-full flex flex-col pt-24 pb-12 overflow-y-auto">
+    <div class="px-4">
+      <nav class="flex flex-col max-w-3xl">
+
+        <a href={url('/')} class="py-3 border-b border-white/8 text-white">
+          <span class="text-3xl sm:text-4xl font-bold tracking-tight" data-nav-text>Home</span>
+        </a>
+
+        <!-- Projects — the label navigates, the chevron expands -->
+        <div class="projects-parent">
+          <div class="flex items-center border-b border-white/8">
+            <a href={projectsPath} class="flex-1 py-3 text-white">
+              <span class="text-3xl sm:text-4xl font-bold tracking-tight" data-nav-text>Projects</span>
+            </a>
+            <button type="button" class="mobile-toggle-btn p-3 -mr-1 text-white/50 hover:text-white transition-colors duration-200" aria-label="Toggle project list" aria-expanded="false">
+              <Icon name="chevron-down" size={28} class="mobile-chevron transition-transform duration-300" />
+            </button>
+          </div>
+
+          <div class="projects-sub">
+            <div class="projects-sub-inner pl-4 sm:pl-8">
+              {projectLinks.map((link) => (
+                <a href={link.path}
+                  class={`flex items-baseline gap-3 py-2.5 border-b border-white/5 transition-colors duration-150 ${link.populated ? 'text-gray-300 hover:text-purple-300' : 'text-gray-500'}`}>
+                  <span class="font-mono text-xs font-semibold w-[3ch] flex-shrink-0 text-purple-400/70">{link.code}</span>
+                  <span class={`flex-1 text-base ${link.isVariant ? 'pl-3 border-l border-white/10' : ''}`}>{link.name}</span>
+                  {!link.populated && <span class="text-[10px] uppercase tracking-wide text-gray-600 flex-shrink-0">Soon</span>}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <a href={url('/about/')} class="py-3 border-b border-white/8 text-white">
+          <span class="text-3xl sm:text-4xl font-bold tracking-tight" data-nav-text>About</span>
+        </a>
+
+        <button id="search-open-mobile" type="button"
+          class="flex items-center gap-4 py-3 border-b border-white/8 text-white w-full text-left">
+          <Icon name="search" size={24} class="text-white/60 flex-shrink-0" />
+          <span class="text-3xl sm:text-4xl font-bold tracking-tight" data-nav-text>Search</span>
+        </button>
+
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Search overlay -->
+<div id="search-overlay" class="fixed inset-0 z-[210] hidden">
+  <div id="search-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+  <div class="relative container mx-auto px-4 mt-24">
+    <div class="max-w-xl mx-auto bg-white/5 backdrop-blur-2xl border border-white/15 rounded-xl shadow-2xl overflow-hidden">
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+        <Icon name="search" size={18} />
+        <input id="search-input" type="text" placeholder="Search projects, tools, disciplines…"
+          autocomplete="off" spellcheck="false"
+          class="flex-1 bg-transparent text-white placeholder-gray-500 text-sm outline-none" />
+        <button id="search-close" type="button" aria-label="Close search" class="text-gray-400 hover:text-white transition-colors">
+          <Icon name="x" size={18} />
+        </button>
+      </div>
+      <div id="search-results" class="max-h-[55vh] overflow-y-auto py-2">
+        <p class="px-4 py-3 text-xs text-gray-500">Start typing to search…</p>
+      </div>
+    </div>
+    <p class="text-center text-xs text-gray-600 mt-3">Press <kbd class="px-1.5 py-0.5 bg-white/10 rounded text-gray-400 font-mono text-xs">Esc</kbd> to close</p>
+  </div>
+</div>
+
+<script type="application/json" id="search-index" is:inline set:html={JSON.stringify(index)}></script>
+
+<style is:global>
+  /* Hamburger → X */
+  .ham-line {
+    position: absolute;
+    left: 0;
+    width: 20px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+    transform-origin: center;
+  }
+  #hamburger-icon.is-open .ham-line:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+  #hamburger-icon.is-open .ham-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  #hamburger-icon.is-open .ham-line:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+  /* Mobile project list expand — grid-rows trick animates to auto height */
+  .projects-sub {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.32s ease, opacity 0.25s ease;
+  }
+  .projects-sub-inner { overflow: hidden; }
+  .projects-parent.is-open .projects-sub {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .projects-parent.is-open .mobile-chevron {
+    transform: rotate(180deg);
+    color: rgba(192, 132, 252, 0.7) !important;
+  }
+
+  /* Desktop nav gradient hover */
+  .nav-desktop-link { color: rgb(209 213 219); }
+  .nav-desktop-link:hover { background-color: rgba(255,255,255,0.05); }
+  .nav-desktop-link:hover .nav-grad-text,
+  .nav-desktop-link--active .nav-grad-text {
+    background: linear-gradient(to right, rgb(192 132 252), rgb(96 165 250));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* Desktop Projects dropdown — opens instantly, closes on a delay so the
+     pointer has time to travel from the trigger into the panel. */
+  .projects-desktop-dropdown {
+    opacity: 0;
+    transform: translateY(-4px);
+    pointer-events: none;
+    transition: opacity 0.18s ease 0.25s, transform 0.18s ease 0.25s;
+  }
+  .projects-desktop-parent:hover .projects-desktop-dropdown,
+  .projects-desktop-parent:focus-within .projects-desktop-dropdown {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .projects-desktop-parent:hover .projects-desktop-chevron,
+  .projects-desktop-parent:focus-within .projects-desktop-chevron {
+    transform: rotate(180deg);
+    color: rgba(192, 132, 252, 0.7) !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ham-line, .projects-sub, .projects-desktop-dropdown, #nav-overlay { transition: none !important; }
+  }
+</style>
+
+<script is:inline>
+  // ── Mobile nav overlay ────────────────────────────────────────────────────
+  (function () {
+    var btn     = document.getElementById('nav-toggle');
+    var overlay = document.getElementById('nav-overlay');
+    if (!btn || !overlay) return;
+    var hamIcon = document.getElementById('hamburger-icon');
+    var open = false;
+
+    var navTexts = Array.from(overlay.querySelectorAll('[data-nav-text]'));
+    navTexts.forEach(function (el) {
+      el.setAttribute('data-original', el.textContent.trim());
+      el.parentElement.style.opacity = '0';
+      el.parentElement.style.transform = 'translateY(-10px)';
+      el.parentElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+    });
+
+    var typingTimers = [];
+    var slideTimers  = [];
+
+    function typeEl(el) {
+      var text = el.getAttribute('data-original');
+      el.textContent = '';
+      var i = 0;
+      var timer = setInterval(function () {
+        el.textContent += text[i++];
+        if (i >= text.length) clearInterval(timer);
+      }, 30);
+      return timer;
+    }
+
+    function animateIn() {
+      typingTimers.forEach(clearInterval);
+      slideTimers.forEach(clearTimeout);
+      typingTimers = []; slideTimers = [];
+
+      navTexts.forEach(function (el) {
+        el.textContent = '';
+        el.parentElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        el.parentElement.style.opacity = '0';
+        el.parentElement.style.transform = 'translateY(-10px)';
+      });
+
+      navTexts.forEach(function (el, i) {
+        var t = setTimeout(function () {
+          el.parentElement.style.opacity = '1';
+          el.parentElement.style.transform = 'translateY(0)';
+          typingTimers.push(typeEl(el));
+        }, 260 + i * 65);
+        slideTimers.push(t);
+      });
+    }
+
+    function animateOut() {
+      typingTimers.forEach(clearInterval);
+      slideTimers.forEach(clearTimeout);
+      typingTimers = []; slideTimers = [];
+
+      navTexts.forEach(function (el) {
+        el.textContent = el.getAttribute('data-original');
+        el.parentElement.style.transition = 'none';
+        el.parentElement.style.opacity = '0';
+        el.parentElement.style.transform = 'translateY(-10px)';
+      });
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          navTexts.forEach(function (el) {
+            el.parentElement.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          });
+        });
+      });
+    }
+
+    function setOpen(val) {
+      open = val;
+      btn.setAttribute('aria-expanded', String(val));
+      overlay.setAttribute('aria-hidden', String(!val));
+      document.body.style.overflow = val ? 'hidden' : '';
+      if (val) {
+        overlay.style.transform = 'translateY(0)';
+        overlay.style.pointerEvents = 'auto';
+        if (hamIcon) hamIcon.classList.add('is-open');
+        animateIn();
+      } else {
+        overlay.style.transform = 'translateY(-100%)';
+        overlay.style.pointerEvents = 'none';
+        if (hamIcon) hamIcon.classList.remove('is-open');
+        animateOut();
+      }
+    }
+
+    btn.addEventListener('click', function () { setOpen(!open); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && open) setOpen(false); });
+    overlay.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () { setOpen(false); });
+    });
+
+    overlay.querySelectorAll('.mobile-toggle-btn').forEach(function (toggleBtn) {
+      toggleBtn.addEventListener('click', function () {
+        var parent = toggleBtn.closest('.projects-parent');
+        if (!parent) return;
+        parent.classList.toggle('is-open');
+        toggleBtn.setAttribute('aria-expanded', String(parent.classList.contains('is-open')));
+      });
+    });
+
+    var mobileSearchBtn  = document.getElementById('search-open-mobile');
+    var desktopSearchBtn = document.getElementById('search-open');
+    if (mobileSearchBtn && desktopSearchBtn) {
+      mobileSearchBtn.addEventListener('click', function () {
+        setOpen(false);
+        setTimeout(function () { desktopSearchBtn.click(); }, 320);
+      });
+    }
+  })();
+
+  // ── Search ────────────────────────────────────────────────────────────────
+  (function () {
+    var overlay  = document.getElementById('search-overlay');
+    var backdrop = document.getElementById('search-backdrop');
+    var input    = document.getElementById('search-input');
+    var results  = document.getElementById('search-results');
+    var openBtn  = document.getElementById('search-open');
+    var closeBtn = document.getElementById('search-close');
+    var indexEl  = document.getElementById('search-index');
+    if (!overlay || !input || !results || !openBtn || !indexEl) return;
+
+    var index = [];
+    try { index = JSON.parse(indexEl.textContent || '[]'); } catch (e) {}
+
+    function openSearch() {
+      overlay.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      setTimeout(function () { input.focus(); }, 40);
+    }
+    function closeSearch() {
+      overlay.classList.add('hidden');
+      document.body.style.overflow = '';
+      input.value = '';
+      renderResults('');
+    }
+
+    function score(item, q) {
+      q = q.toLowerCase();
+      var t = (item.title || '').toLowerCase();
+      var d = (item.description || '').toLowerCase();
+      var g = (item.tags || []).join(' ').toLowerCase();
+      if (t === q) return 100;
+      if (t.startsWith(q)) return 80;
+      if (t.includes(q)) return 60;
+      if (g.includes(q)) return 40;
+      if (d.includes(q)) return 20;
+      var words = q.split(/\s+/).filter(Boolean);
+      if (words.length > 1) {
+        var hits = words.filter(function (w) { return t.includes(w) || g.includes(w) || d.includes(w); }).length;
+        if (hits) return Math.round((hits / words.length) * 15);
+      }
+      return 0;
+    }
+
+    function esc(s) {
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function renderResults(query) {
+      if (!query.trim()) {
+        results.innerHTML = '<p class="px-4 py-3 text-xs text-gray-500">Start typing to search…</p>';
+        return;
+      }
+      var matches = index
+        .map(function (item) { return { item: item, s: score(item, query) }; })
+        .filter(function (x) { return x.s > 0; })
+        .sort(function (a, b) { return b.s - a.s; })
+        .slice(0, 10)
+        .map(function (x) { return x.item; });
+
+      if (!matches.length) {
+        results.innerHTML = '<p class="px-4 py-3 text-sm text-gray-400">No results for "' + esc(query) + '"</p>';
+        return;
+      }
+      results.innerHTML = matches.map(function (item) {
+        return '<a href="' + esc(item.path) + '" class="flex flex-col gap-0.5 px-4 py-3 hover:bg-white/5 transition-colors">'
+          + '<span class="text-sm font-medium text-white">' + esc(item.title) + '</span>'
+          + '<span class="text-xs text-gray-500 truncate">' + esc(item.description || '') + '</span>'
+          + '</a>';
+      }).join('');
+    }
+
+    openBtn.addEventListener('click', openSearch);
+    if (closeBtn) closeBtn.addEventListener('click', closeSearch);
+    if (backdrop) backdrop.addEventListener('click', closeSearch);
+    input.addEventListener('input', function () { renderResults(input.value); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); var first = results.querySelector('a'); if (first) first.focus(); }
+    });
+    results.addEventListener('keydown', function (e) {
+      var links = Array.from(results.querySelectorAll('a'));
+      var idx = links.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown') { e.preventDefault(); if (links[idx + 1]) links[idx + 1].focus(); }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); if (idx > 0) links[idx - 1].focus(); else input.focus(); }
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSearch();
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        overlay.classList.contains('hidden') ? openSearch() : closeSearch();
+      }
+    });
+  })();
+</script>

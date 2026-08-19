@@ -1,0 +1,75 @@
+---
+import Icon from './Icon.astro';
+import { projectCode, projectTitle, projectHref } from '../lib/projects.js';
+import { assetUrl } from '../lib/url.js';
+
+const { project } = Astro.props;
+
+const cover = project.images.find((i) => i.exists) ?? null;
+const blurb = project.overview.find((o) => o.label === 'What it is')?.text
+  ?? project.overview[0]?.text
+  ?? '';
+---
+<a href={projectHref(project)}
+  class={`group flex flex-col rounded-2xl border overflow-hidden transition-all duration-300 ${
+    project.populated
+      ? 'bg-slate-800/40 border-white/10 hover:border-purple-400/40 hover:bg-slate-800/70 hover:-translate-y-1'
+      : 'bg-slate-900/40 border-white/5 hover:border-white/15'
+  }`}>
+
+  <!-- Cover — fixed aspect so a mixed grid stays aligned -->
+  <div class="relative aspect-[16/10] bg-slate-900 overflow-hidden flex-shrink-0">
+    {cover ? (
+      <img src={assetUrl(cover.src)} alt={`${projectTitle(project)} — preview`} loading="lazy" decoding="async"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+    ) : (
+      <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-blue-900/20">
+        <Icon name={project.populated ? 'image-off' : 'clock'} size={36} class="text-white/15" />
+      </div>
+    )}
+
+    <span class="absolute top-3 left-3 font-mono text-xs font-bold px-2 py-1 rounded-md bg-slate-950/80 backdrop-blur border border-white/10 text-purple-300">
+      {projectCode(project)}
+    </span>
+
+    {project.status && (
+      <span class="absolute top-3 right-3 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-500/20 backdrop-blur border border-purple-400/40 text-purple-200">
+        {project.status}
+      </span>
+    )}
+    {!project.populated && (
+      <span class="absolute top-3 right-3 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 text-gray-400">
+        Coming Soon
+      </span>
+    )}
+  </div>
+
+  <div class="flex flex-col flex-grow p-5">
+    <h3 class={`text-lg font-bold leading-snug mb-1 transition-colors ${project.populated ? 'text-white group-hover:text-purple-300' : 'text-gray-400'}`}>
+      {projectTitle(project)}
+    </h3>
+
+    {project.projectType && (
+      <p class="text-xs text-blue-300/80 mb-3">{project.projectType}</p>
+    )}
+
+    {blurb ? (
+      <p class="text-sm text-gray-400 leading-relaxed line-clamp-3 mb-4">{blurb}</p>
+    ) : (
+      <p class="text-sm text-gray-600 italic mb-4">Write-up in progress.</p>
+    )}
+
+    <div class="mt-auto pt-3 border-t border-white/5 flex items-center justify-between gap-3">
+      <div class="flex flex-wrap gap-1.5 min-w-0">
+        {project.disciplines.slice(0, 2).map((d) => (
+          <span class="text-[11px] px-2 py-0.5 rounded-md bg-white/5 border border-white/10 text-gray-400 truncate">{d}</span>
+        ))}
+        {project.disciplines.length > 2 && (
+          <span class="text-[11px] px-2 py-0.5 text-gray-600">+{project.disciplines.length - 2}</span>
+        )}
+      </div>
+      <Icon name="arrow-right" size={18}
+        class="text-purple-400 flex-shrink-0 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
+    </div>
+  </div>
+</a>

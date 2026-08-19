@@ -1,0 +1,20 @@
+---
+import { getIconSvg } from '../lib/icon.js';
+
+const { name, size = 24, class: className = '', strokeWidth } = Astro.props;
+
+let svg = getIconSvg(name);
+if (size && size !== 24) {
+  svg = svg
+    .replace(/width="24"/, `width="${size}"`)
+    .replace(/height="24"/, `height="${size}"`);
+}
+svg = svg.replace(
+  /class="lucide lucide-[^"]*"/,
+  className ? `class="${className}"` : 'class=""'
+);
+if (strokeWidth) {
+  svg = svg.replace(/stroke-width="2"/, `stroke-width="${strokeWidth}"`);
+}
+---
+<Fragment set:html={svg} />

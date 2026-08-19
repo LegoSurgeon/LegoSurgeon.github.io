@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { projects, projectCount, populatedCount, AUTHOR, SITE_TITLE } from '../../lib/projects.js';
+
+// Filter chips are derived from the data, so a new discipline in the workbook
+// becomes a filter without touching this file.
+const disciplines = [...new Set(projects.flatMap((p) => p.disciplines))].sort((a, b) => a.localeCompare(b));
+
+// Each card carries its own searchable haystack; filtering is pure client-side
+// string matching over these attributes.
+const cards = projects.map((p) => ({
+  project: p,
+  haystack: [p.short, p.title, p.projectType, p.status, p.role, ...p.disciplines, ...p.tools]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase(),
+}));
+---
+<BaseLayout
+  title={`Projects — ${SITE_TITLE}`}
+  description={`All ${projectCount} engineering projects by ${AUTHOR}, from robotics and mechatronics to tooling and mechanical design.`}
+>
+  <div class="min-h-screen bg-slate-900">
+
+    <section class="relative pt-36 pb-14 overflow-hidden">
+      <div class="absolute inset-0 bg-gradient-to-br from-purple-900/30 via-slate-900 to-blue-900/30"></div>
+      <div class="relative z-10 container mx-auto px-4">
+        <div class="max-w-4xl mx-auto text-center">
+          <div class="inline-flex items-center space-x-2 bg-purple-500/15 border border-purple-400/40 rounded-full px-5 py-2 mb-6">
+            <Icon name="layers" size={16} class="text-purple-300" />
+            <span class="text-purple-200 text-sm font-semibold tracking-wide uppercase">The Catalog</span>
+          </div>
+          <h1 class="text-4xl sm:text-5xl md:text-6xl font-bold mb-6">
+            <span class="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
+              Projects
+            </span>
+          </h1>
+          <p class="text-lg sm:text-xl text-gray-300 leading-relaxed">
+            {projectCount} projects — {populatedCount} written up so far, the rest in progress.
+            Filter by discipline or search to narrow the list.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-slate-950 border-t border-white/10 py-8 sticky top-[64px] z-[100] backdrop-blur-xl bg-slate-950/85">
+      <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto flex flex-col gap-4">
+
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+              <Icon name="search" size={18} />
+            </span>
+            <input id="catalog-search" type="text" placeholder="Search projects, tools, disciplines…"
+              autocomplete="off" spellcheck="false" aria-label="Filter projects"
+              class="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white placeholder-gray-500 text-sm outline-none focus:border-purple-400/50 focus:bg-white/[0.07] transition-colors" />
+          </div>
+
+          <div class="flex flex-wrap gap-2 items-center">
+            <button type="button" data-filter="" aria-pressed="true"
+              class="catalog-chip is-active text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors">
+              All
+            </button>
+            <button type="button" data-filter="__todo" aria-pressed="false"
+              class="catalog-chip text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors">
+              Coming Soon
+            </button>
+            {disciplines.map((d) => (
+              <button type="button" data-filter={d.toLowerCase()} aria-pressed="false"
+                class="catalog-chip text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors">
+                {d}
+              </button>
+            ))}
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-slate-950 pb-20">
+      <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+          <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {cards.map(({ project, haystack }) => (
+              <div class="catalog-item" data-haystack={haystack} data-populated={String(project.populated)}>
+                <ProjectCard project={project} />
+              </div>
+            ))}
+          </div>
+
+          <p id="catalog-empty" class="hidden text-center text-gray-500 py-16">
+            No projects match that filter.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <style is:global>
+    .catalog-chip {
+      border-color: rgba(255,255,255,0.10);
+      background-color: rgba(255,255,255,0.04);
+      color: rgb(156 163 175);
+    }
+    .catalog-chip:hover {
+      border-color: rgba(192,132,252,0.35);
+      color: rgb(216 180 254);
+    }
+    .catalog-chip.is-active {
+      background: linear-gradient(to right, rgb(147 51 234), rgb(37 99 235));
+      border-color: transparent;
+      color: #fff;
+    }
+  </style>
+
+  <script is:inline>
+    (function () {
+      var search = document.getElementById('catalog-search');
+      var grid   = document.getElementById('catalog-grid');
+      var empty  = document.getElementById('catalog-empty');
+      if (!grid) return;
+
+      var items = Array.from(grid.querySelectorAll('.catalog-item'));
+      var chips = Array.from(document.querySelectorAll('.catalog-chip'));
+      var activeFilter = '';
+
+      function apply() {
+        var q = (search && search.value || '').trim().toLowerCase();
+        var shown = 0;
+
+        items.forEach(function (item) {
+          var hay = item.getAttribute('data-haystack') || '';
+          var populated = item.getAttribute('data-populated') === 'true';
+
+          var matchesChip =
+            activeFilter === '' ? true :
+            activeFilter === '__todo' ? !populated :
+            hay.indexOf(activeFilter) !== -1;
+
+          var matchesQuery = !q || hay.indexOf(q) !== -1;
+          var visible = matchesChip && matchesQuery;
+
+          item.style.display = visible ? '' : 'none';
+          if (visible) shown++;
+        });
+
+        if (empty) empty.classList.toggle('hidden', shown > 0);
+      }
+
+      chips.forEach(function (chip) {
+        chip.addEventListener('click', function () {
+          activeFilter = chip.getAttribute('data-filter') || '';
+          chips.forEach(function (c) {
+            var on = c === chip;
+            c.classList.toggle('is-active', on);
+            c.setAttribute('aria-pressed', String(on));
+          });
+          apply();
+        });
+      });
+
+      if (search) search.addEventListener('input', apply);
+      apply();
+    })();
+  </script>
+</BaseLayout>

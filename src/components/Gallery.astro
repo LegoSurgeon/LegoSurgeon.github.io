@@ -1,0 +1,96 @@
+---
+import Icon from './Icon.astro';
+import { assetUrl } from '../lib/url.js';
+
+const { images = [], title = '' } = Astro.props;
+
+// Images the workbook names but that aren't in images/ yet are surfaced rather
+// than hidden, so a missing file is obvious while drafting.
+const present = images.filter((i) => i.exists);
+const missing = images.filter((i) => !i.exists);
+---
+{present.length > 0 && (
+  <div>
+    <div class={`grid gap-4 ${present.length === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
+      {present.map((img, i) => (
+        <button type="button"
+          class="lightbox-open group relative rounded-xl overflow-hidden border border-white/10 bg-slate-900 hover:border-purple-400/40 transition-colors duration-300"
+          data-src={assetUrl(img.src)}
+          data-caption={`${title} — image ${i + 1} of ${present.length}`}
+          aria-label={`View larger: image ${i + 1} of ${present.length}`}>
+          <img src={assetUrl(img.src)} alt={`${title} — image ${i + 1}`} loading="lazy" decoding="async"
+            class="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.03]" />
+          <span class="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/25 transition-colors duration-300 flex items-center justify-center">
+            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-slate-950/80 backdrop-blur rounded-full p-2.5 border border-white/15">
+              <Icon name="maximize-2" size={18} class="text-white" />
+            </span>
+          </span>
+        </button>
+      ))}
+    </div>
+
+    {missing.length > 0 && (
+      <p class="mt-4 text-xs text-amber-300/70">
+        {missing.length} image{missing.length > 1 ? 's' : ''} referenced in the workbook
+        but not found in <code class="font-mono">images/</code>: {missing.map((m) => m.file).join(', ')}
+      </p>
+    )}
+  </div>
+)}
+
+<!-- Lightbox — one instance per page, reused by every thumbnail -->
+<div id="lightbox" class="fixed inset-0 z-[300] hidden items-center justify-center p-4 sm:p-8">
+  <div id="lightbox-backdrop" class="absolute inset-0 bg-slate-950/92 backdrop-blur-sm"></div>
+  <button id="lightbox-close" type="button" aria-label="Close image"
+    class="absolute top-4 right-4 z-10 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-white transition-colors">
+    <Icon name="x" size={22} />
+  </button>
+  <figure class="relative z-[1] max-w-6xl w-full flex flex-col items-center gap-3">
+    <img id="lightbox-img" src="" alt="" class="max-h-[80vh] w-auto max-w-full rounded-lg shadow-2xl" />
+    <figcaption id="lightbox-caption" class="text-sm text-gray-400 text-center"></figcaption>
+  </figure>
+</div>
+
+<script is:inline>
+  (function () {
+    var box     = document.getElementById('lightbox');
+    var img     = document.getElementById('lightbox-img');
+    var caption = document.getElementById('lightbox-caption');
+    var closeBtn = document.getElementById('lightbox-close');
+    var backdrop = document.getElementById('lightbox-backdrop');
+    if (!box || !img) return;
+
+    var lastFocused = null;
+
+    function open(src, text) {
+      lastFocused = document.activeElement;
+      img.src = src;
+      img.alt = text || '';
+      if (caption) caption.textContent = text || '';
+      box.classList.remove('hidden');
+      box.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function close() {
+      box.classList.add('hidden');
+      box.classList.remove('flex');
+      document.body.style.overflow = '';
+      img.src = '';
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    document.querySelectorAll('.lightbox-open').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        open(btn.getAttribute('data-src'), btn.getAttribute('data-caption'));
+      });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !box.classList.contains('hidden')) close();
+    });
+  })();
+</script>
