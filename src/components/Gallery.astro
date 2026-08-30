@@ -8,25 +8,60 @@ const { images = [], title = '' } = Astro.props;
 // than hidden, so a missing file is obvious while drafting.
 const present = images.filter((i) => i.exists);
 const missing = images.filter((i) => !i.exists);
+
+// Captions run to two lines at these tile widths. Reserving the space on every
+// figure keeps the tiles below a caption on one row aligned with each other,
+// which is the whole point of a fixed tile size. Skipped entirely when no image
+// in this gallery has a caption, so an uncaptioned set gets no dead space.
+const anyCaption = present.some((i) => i.caption);
 ---
-{present.length > 0 && (
+<!--
+  Guarded on present *or* missing: when every image in a sheet is missing there
+  are no tiles to draw, and nesting the notice under a present-only guard hid it
+  in exactly the case it most needed to be seen.
+-->
+{(present.length > 0 || missing.length > 0) && (
   <div>
-    <div class={`grid gap-4 ${present.length === 1 ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
-      {present.map((img, i) => (
-        <button type="button"
-          class="lightbox-open group relative rounded-xl overflow-hidden border border-white/10 bg-slate-900 hover:border-purple-400/40 transition-colors duration-300"
-          data-src={assetUrl(img.src)}
-          data-caption={`${title} — image ${i + 1} of ${present.length}`}
-          aria-label={`View larger: image ${i + 1} of ${present.length}`}>
-          <img src={assetUrl(img.src)} alt={`${title} — image ${i + 1}`} loading="lazy" decoding="async"
-            class="w-full h-auto block transition-transform duration-500 group-hover:scale-[1.03]" />
-          <span class="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/25 transition-colors duration-300 flex items-center justify-center">
-            <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-slate-950/80 backdrop-blur rounded-full p-2.5 border border-white/15">
-              <Icon name="maximize-2" size={18} class="text-white" />
-            </span>
-          </span>
-        </button>
-      ))}
+    <!--
+      Every tile is the same 4:3 box, which is the median aspect across the
+      portfolio's images (p25 1.17, p75 1.44) — so most fill it almost exactly.
+
+      object-contain, not object-cover: a fixed tile with cover would crop, and
+      the point of the grid is that a visitor can read an image without opening
+      it. Nothing is cut off; the few outliers (a 3.17 panorama, a 0.55 portrait)
+      letterbox against the tile background instead.
+
+      Two columns rather than three on desktop for the same reason — inside a
+      fixed-width container, more columns only means smaller images.
+    -->
+    <div class:list={['gap-5 grid-cols-1 sm:grid-cols-2', present.length > 0 ? 'grid' : 'hidden']}>
+      {present.map((img, i) => {
+        // "Image N Caption" in the workbook is optional; where it is missing we
+        // fall back to the positional label so the lightbox and alt text still
+        // say something useful.
+        const position = `image ${i + 1} of ${present.length}`;
+        const caption = img.caption || '';
+        return (
+          <figure class="flex flex-col gap-2">
+            <button type="button"
+              class="lightbox-open group relative block w-full aspect-[4/3] rounded-xl overflow-hidden border border-white/10 bg-slate-900 hover:border-purple-400/40 transition-colors duration-300"
+              data-src={assetUrl(img.src)}
+              data-caption={caption || `${title} — ${position}`}
+              aria-label={`View larger: ${caption || position}`}>
+              <img src={assetUrl(img.src)} alt={caption || `${title} — image ${i + 1}`} loading="lazy" decoding="async"
+                class="absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-[1.03]" />
+              <span class="absolute inset-0 bg-slate-950/0 group-hover:bg-slate-950/25 transition-colors duration-300 flex items-center justify-center">
+                <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-slate-950/80 backdrop-blur rounded-full p-2.5 border border-white/15">
+                  <Icon name="maximize-2" size={18} class="text-white" />
+                </span>
+              </span>
+            </button>
+            {anyCaption && (
+              <figcaption class="px-1 text-sm text-gray-400 leading-snug sm:min-h-[2.75em]">{caption}</figcaption>
+            )}
+          </figure>
+        );
+      })}
     </div>
 
     {missing.length > 0 && (

@@ -1,0 +1,154 @@
+---
+/**
+ * Poster-frame preview for a workbook "Video N" row, plus the overlay it opens.
+ *
+ * The poster frame is resolved by the builder and handed over as `poster` — a
+ * "Video N Thumbnail" row in the workbook, else `video.thumbnail` in
+ * image_captions.json, else the project's first image as a last resort.
+ * Nothing from YouTube is requested until the visitor clicks: the
+ * iframe has no src until then, and gets its src cleared again on close, which
+ * is also what stops playback.
+ *
+ * Only videos marked `visible` reach this component — a blank or "N/A" cell is
+ * filtered out by the caller, per the workbook's N/A rendering rule.
+ */
+import Icon from './Icon.astro';
+import { assetUrl } from '../lib/url.js';
+
+const { videos = [], title = '' } = Astro.props;
+const shown = videos.filter((v) => v.visible);
+---
+{shown.length > 0 && (
+  <div class={`grid gap-6 ${shown.length === 1 ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
+    {shown.map((video, i) => {
+      const label = video.caption || (shown.length > 1 ? `${title} — video ${i + 1}` : title);
+      return (
+        <figure class="flex flex-col gap-3">
+          <button type="button"
+            class="video-open group relative block w-full aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-900 hover:border-purple-400/40 transition-colors duration-300"
+            data-embed={video.embedUrl}
+            data-title={label}
+            aria-label={`Play video: ${label}`}>
+
+            {video.posterExists ? (
+              <>
+                <!--
+                  The poster frame is chosen for what it shows, not for its
+                  shape, so it is rarely 16:9 — contain keeps all of it, and the
+                  same file blurred underneath fills the letterbox bars rather
+                  than leaving flat slabs of background. One download, both
+                  layers, so the fill costs nothing extra.
+                -->
+                <img src={assetUrl(video.poster)} alt="" aria-hidden="true" loading="lazy" decoding="async"
+                  class="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-40" />
+                <img src={assetUrl(video.poster)} alt="" aria-hidden="true" loading="lazy" decoding="async"
+                  class="absolute inset-0 w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
+              </>
+            ) : (
+              <span class="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-slate-900 to-blue-900/40"></span>
+            )}
+
+            <!-- Scrim: keeps the play badge legible over a bright poster frame -->
+            <span class="absolute inset-0 bg-slate-950/35 group-hover:bg-slate-950/20 transition-colors duration-300"></span>
+
+            <span class="absolute inset-0 flex items-center justify-center">
+              <span class="flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-slate-950/70 backdrop-blur border border-white/20 text-white shadow-2xl transition-transform duration-300 group-hover:scale-110 group-active:scale-95">
+                <!-- nudged right so the triangle looks centred inside the circle -->
+                <Icon name="play" size={30} class="translate-x-[2px] fill-current" />
+              </span>
+            </span>
+
+            <span class="absolute bottom-3 left-3 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-slate-950/80 backdrop-blur border border-white/15 text-gray-200">
+              <Icon name="youtube" size={13} class="text-red-400" />
+              Watch on this page
+            </span>
+          </button>
+
+          {video.caption && (
+            <figcaption class="px-1 text-sm text-gray-400 leading-snug">{video.caption}</figcaption>
+          )}
+        </figure>
+      );
+    })}
+  </div>
+)}
+
+<!--
+  One overlay per page, reused by every preview above.
+
+  Sizing: the player is capped by width *and* by height so it stays fully on
+  screen in landscape on a phone, where a plain `aspect-video` element sized to
+  the viewport width would run off the bottom. 100dvh, not 100vh, so the mobile
+  browser's collapsing address bar doesn't crop the frame.
+-->
+<div id="video-overlay" class="fixed inset-0 z-[400] hidden items-center justify-center p-3 sm:p-6">
+  <div id="video-overlay-backdrop" class="absolute inset-0 bg-slate-950/95 backdrop-blur-sm"></div>
+
+  <button id="video-overlay-close" type="button" aria-label="Close video"
+    class="absolute z-10 p-3 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/25 border border-white/20 text-white transition-colors"
+    style="top: max(0.75rem, env(safe-area-inset-top)); right: max(0.75rem, env(safe-area-inset-right));">
+    <Icon name="x" size={22} />
+  </button>
+
+  <figure class="relative z-[1] w-full flex flex-col items-center gap-3"
+    style="max-width: min(64rem, 100%, calc((100dvh - 8rem) * 16 / 9));">
+    <div class="w-full aspect-video rounded-lg overflow-hidden bg-black shadow-2xl border border-white/10">
+      <!-- src stays empty until a preview is clicked; clearing it stops playback -->
+      <iframe id="video-overlay-frame" class="w-full h-full block" src="" title="Project video"
+        frameborder="0" allowfullscreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        referrerpolicy="strict-origin-when-cross-origin"></iframe>
+    </div>
+    <figcaption id="video-overlay-caption" class="text-sm text-gray-400 text-center px-2"></figcaption>
+  </figure>
+</div>
+
+<script is:inline>
+  (function () {
+    var box      = document.getElementById('video-overlay');
+    var frame    = document.getElementById('video-overlay-frame');
+    var caption  = document.getElementById('video-overlay-caption');
+    var closeBtn = document.getElementById('video-overlay-close');
+    var backdrop = document.getElementById('video-overlay-backdrop');
+    if (!box || !frame) return;
+
+    var lastFocused = null;
+
+    function open(embedUrl, text) {
+      if (!embedUrl) return;
+      lastFocused = document.activeElement;
+      // playsinline keeps iOS Safari from hijacking the video into its own
+      // fullscreen player, which would leave our overlay stranded behind it.
+      // autoplay is honoured because we are inside the click that opened this.
+      frame.src = embedUrl +
+        (embedUrl.indexOf('?') === -1 ? '?' : '&') +
+        'autoplay=1&playsinline=1&rel=0&modestbranding=1';
+      if (caption) caption.textContent = text || '';
+      box.classList.remove('hidden');
+      box.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+      if (closeBtn) closeBtn.focus();
+    }
+
+    function close() {
+      if (box.classList.contains('hidden')) return;
+      box.classList.add('hidden');
+      box.classList.remove('flex');
+      document.body.style.overflow = '';
+      frame.src = '';
+      if (lastFocused && lastFocused.focus) lastFocused.focus();
+    }
+
+    document.querySelectorAll('.video-open').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        open(btn.getAttribute('data-embed'), btn.getAttribute('data-title'));
+      });
+    });
+
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') close();
+    });
+  })();
+</script>

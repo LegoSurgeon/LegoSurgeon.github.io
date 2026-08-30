@@ -11,22 +11,36 @@
  *   ─────────────────────────    ────────────────────────────────
  *   Title                        MK2 Modular Chassis
  *   Status                       In Development
+ *   Year Made                    2026
  *   Project Type                 FTC Robotics / Modular …
  *   Role                         Sole chassis and subsystem designer
  *   Disciplines                  Mechanical Design, Mechatronics, …
  *   Tools                        Fusion 360, KiCad, …
  *   Project Overview             ← section separator, blank B cell
  *   What it is                   Modular Chassis MK2 is the second …
+ *   Bricklink Page               N/A                  ← catalogued, not rendered
  *   …
  *   Image 1                      C:\Users\…\Screenshot ….png
+ *   Image 1 Caption              Full Layout          ← optional, per image
+ *   Video 1                      https://youtu.be/lvcCY7FPsXI
+ *   Video Caption                Transformation Sequence
+ *   Video Thumbnail              C:\Users\…\Screenshot ….png   ← poster frame
+ *
+ * The workbook is the only source. Captions, video captions and video poster
+ * frames all come from these rows and nowhere else.
  *
  * Sheet names carry ordering and grouping: "1A. MK2 Modular Chassis" means
  * project 1, variant A. Variants of one project (1A, 1B, 1C…) are grouped
  * together, with A as the primary and the rest as sub-pages. A sheet with no
  * letter ("2. MK1 Modular Chassis") is a standalone project.
  *
- * Anything not in KNOWN_FIELDS is preserved under `extra`, so new rows added to
- * the workbook survive this script rather than being silently dropped.
+ * SECTION CATALOG — the first sheet lists every section title the portfolio
+ * knows about, most of them set to "N/A". That column A is the catalog, and
+ * every project carries the *whole* catalog in `overview`: a section the sheet
+ * fills in gets its prose, one it doesn't gets "N/A". Each entry is tagged with
+ * `visible`, which is false for "N/A" and for blanks. Nothing is dropped here —
+ * hiding is a rendering rule, applied by the components, so the JSON stays a
+ * faithful copy of the workbook.
  */
 
 import fs from 'node:fs';
@@ -49,20 +63,11 @@ const PUBLIC_IMAGE_DIR = path.join(ROOT, 'public', 'images');
 const KNOWN_FIELDS = {
   'title': 'title',
   'status': 'status',
+  'year made': 'year',
   'project type': 'projectType',
   'role': 'role',
   'disciplines': 'disciplines',
   'tools': 'tools',
-};
-
-// Narrative prose rows, in the order they should appear on the page. Rows are
-// emitted in workbook order, so reordering the spreadsheet reorders the page.
-const OVERVIEW_FIELDS = {
-  'what it is': 'What it is',
-  'why i made it': 'Why I made it',
-  'what i designed': 'What I designed',
-  'key engineering challenge': 'Key engineering challenge',
-  'what i learned': 'What I learned',
 };
 
 const SEPARATORS = new Set(['project overview']);
@@ -70,8 +75,31 @@ const SEPARATORS = new Set(['project overview']);
 // Comma-separated cells that become chip lists on the page.
 const LIST_FIELDS = new Set(['disciplines', 'tools']);
 
+// Row labels that carry media rather than prose, so they never become sections.
+const IMAGE_ROW = /^image\s*(\d+)$/;
+const IMAGE_CAPTION_ROW = /^image\s*(\d+)\s*caption$/;
+const VIDEO_ROW = /^video\s*(\d+)$/;
+// The number is optional on these two — the workbook writes "Video Caption",
+// not "Video 1 Caption" — and an absent one means the first video.
+const VIDEO_CAPTION_ROW = /^video\s*(\d*)\s*caption$/;
+const VIDEO_THUMB_ROW = /^video\s*(\d*)\s*(?:thumbnail|poster)$/;
+
 const norm = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
 const key = (s) => norm(s).toLowerCase();
+
+/** "N/A", "n/a", "NA" — the workbook's way of saying "not part of this project". */
+const isNotApplicable = (s) => /^n\s*\/?\s*a$/i.test(norm(s));
+
+/**
+ * A narrative section whose whole body is a file path is not prose — it is a
+ * media row whose label was mistyped ("Video Tumbnail"), so it missed the media
+ * patterns above and fell through to the section catalog. Left alone it
+ * publishes a raw local path onto the page, so it is worth shouting about.
+ */
+const looksLikePath = (s) => {
+  const v = norm(s).replace(/^["']+|["']+$/g, '');
+  return /^(?:[A-Za-z]:[\\/]|\\\\|\/)/.test(v) && /\.[A-Za-z0-9]{2,5}$/.test(v);
+};
 
 const slugify = (s) =>
   norm(s)
@@ -96,6 +124,48 @@ function imageFileName(raw) {
   return norm(raw).replace(/^["']+|["']+$/g, '').split(/[\\/]/).pop() ?? '';
 }
 
+/**
+ * youtu.be/ID · watch?v=ID · /embed/ID · /shorts/ID -> "ID", anything else null.
+ * Only the id travels into the JSON, so the page can build a privacy-mode embed
+ * URL itself rather than trusting whatever share link Excel happened to hold.
+ */
+function youtubeId(raw) {
+  const value = norm(raw).replace(/^["']+|["']+$/g, '');
+  if (!value) return null;
+  const m =
+    value.match(/(?:youtu\.be\/)([A-Za-z0-9_-]{6,})/) ??
+    value.match(/(?:[?&]v=)([A-Za-z0-9_-]{6,})/) ??
+    value.match(/(?:\/(?:embed|shorts|live|v)\/)([A-Za-z0-9_-]{6,})/);
+  if (m) return m[1];
+  // A bare id pasted into the cell, with no URL around it.
+  return /^[A-Za-z0-9_-]{11}$/.test(value) ? value : null;
+}
+
+/**
+ * Column A of every sheet, deduplicated, minus the fixed fields and the media
+ * rows: the full list of section titles the portfolio can show. The first sheet
+ * spells the catalog out in full, so its order and its capitalisation win; any
+ * title only a later sheet uses is appended in the order it is first seen.
+ */
+function collectSectionCatalog(wb) {
+  const catalog = [];
+  const seen = new Set();
+
+  for (const sheetName of wb.SheetNames) {
+    for (const { label } of readSheetPairs(wb.Sheets[sheetName])) {
+      const k = key(label);
+      if (!k || seen.has(k)) continue;
+      if (SEPARATORS.has(k) || k in KNOWN_FIELDS) continue;
+      if (IMAGE_ROW.test(k) || IMAGE_CAPTION_ROW.test(k)) continue;
+      if (VIDEO_ROW.test(k) || VIDEO_CAPTION_ROW.test(k) || VIDEO_THUMB_ROW.test(k)) continue;
+      seen.add(k);
+      catalog.push({ key: k, label: norm(label) });
+    }
+  }
+
+  return catalog;
+}
+
 function readSheetPairs(sheet) {
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: null });
   const pairs = [];
@@ -108,8 +178,20 @@ function readSheetPairs(sheet) {
   return pairs;
 }
 
-function buildProject(sheetName, pairs, availableImages) {
+function buildProject(sheetName, pairs, availableImages, catalog) {
   const { number, variant, short } = parseSheetName(sheetName);
+
+  // "Image 3 Caption" may sit above or below its "Image 3" row, so captions are
+  // collected by index here and merged once every row has been read.
+  const captions = new Map();
+  const videoCaptions = new Map();
+  const videoThumbs = new Map();
+  const videoRows = [];
+
+  // Sections this sheet actually spells out, in sheet order. The rest of the
+  // catalog is appended as "N/A" once the sheet has been read.
+  const sectionText = new Map();
+  const sectionOrder = [];
 
   const project = {
     sheet: sheetName,
@@ -119,13 +201,14 @@ function buildProject(sheetName, pairs, availableImages) {
     slug: slugify(short || sheetName),
     title: '',
     status: '',
+    year: '',
     projectType: '',
     role: '',
     disciplines: [],
     tools: [],
     overview: [],
     images: [],
-    extra: {},
+    videos: [],
   };
 
   for (const { label, value } of pairs) {
@@ -139,13 +222,8 @@ function buildProject(sheetName, pairs, availableImages) {
       continue;
     }
 
-    if (k in OVERVIEW_FIELDS) {
-      if (value) project.overview.push({ label: OVERVIEW_FIELDS[k], text: value });
-      continue;
-    }
-
     // "Image 1", "Image 12", … — index preserved so gaps don't renumber.
-    const img = k.match(/^image\s*(\d+)$/);
+    const img = k.match(IMAGE_ROW);
     if (img) {
       if (!value) continue;
       const file = imageFileName(value);
@@ -154,23 +232,99 @@ function buildProject(sheetName, pairs, availableImages) {
         file,
         src: `/images/${file}`,
         exists: availableImages.has(file.toLowerCase()),
+        caption: '',
       });
       continue;
     }
 
-    // Unrecognised row: keep prose under overview so it still reaches the page,
-    // and stash the raw value so nothing is lost.
-    if (value) {
-      project.overview.push({ label: norm(label), text: value });
-      project.extra[norm(label)] = value;
+    // "Image 1 Caption" — optional. Matched before the section fallback below so
+    // it never leaks into the narrative as a prose block of its own.
+    const capt = k.match(IMAGE_CAPTION_ROW);
+    if (capt) {
+      if (value) captions.set(Number(capt[1]), value);
+      continue;
     }
+
+    const vid = k.match(VIDEO_ROW);
+    if (vid) {
+      videoRows.push({ index: Number(vid[1]), url: value });
+      continue;
+    }
+
+    const vcapt = k.match(VIDEO_CAPTION_ROW);
+    if (vcapt) {
+      if (value) videoCaptions.set(Number(vcapt[1] || 1), value);
+      continue;
+    }
+
+    // "Video Thumbnail" — an explicit poster frame, which is usually not the
+    // project's first image. Takes the same absolute-path form as an image row.
+    const vthumb = k.match(VIDEO_THUMB_ROW);
+    if (vthumb) {
+      if (value) videoThumbs.set(Number(vthumb[1] || 1), imageFileName(value));
+      continue;
+    }
+
+    // Everything else is a narrative section. "N/A" and blanks are kept here
+    // too — they are marked invisible below rather than dropped.
+    if (!sectionText.has(k)) sectionOrder.push(k);
+    sectionText.set(k, value);
   }
 
+  // Sections the sheet fills in first, in its own order, then the rest of the
+  // catalog, so every project carries the same set of keys.
+  const labels = new Map(catalog.map((c) => [c.key, c.label]));
+  for (const k of sectionOrder) {
+    const text = sectionText.get(k) ?? '';
+    project.overview.push({
+      label: labels.get(k) ?? k,
+      text: text || 'N/A',
+      visible: Boolean(text) && !isNotApplicable(text),
+    });
+  }
+  for (const { key: k, label } of catalog) {
+    if (sectionText.has(k)) continue;
+    project.overview.push({ label, text: 'N/A', visible: false });
+  }
+
+  for (const image of project.images) {
+    image.caption = captions.get(image.index) ?? '';
+  }
   project.images.sort((a, b) => a.index - b.index);
+
+  // Poster frame: an explicit "Video Thumbnail" row if the sheet has one, and
+  // only failing that the project's first image. `posterSource` records which
+  // it was, so a fallback poster is visible in the JSON rather than looking
+  // like a deliberate choice.
+  const firstImage = project.images.find((i) => i.index === 1) ?? project.images[0] ?? null;
+
+  project.videos = videoRows
+    .sort((a, b) => a.index - b.index)
+    .map(({ index, url }) => {
+      const id = youtubeId(url);
+      const named = videoThumbs.get(index);
+      const file = named ?? (firstImage ? firstImage.file : '');
+      return {
+        index,
+        url,
+        youtubeId: id ?? '',
+        embedUrl: id ? `https://www.youtube-nocookie.com/embed/${id}` : '',
+        caption: videoCaptions.get(index) ?? '',
+        poster: file ? `/images/${file}` : '',
+        posterFile: file,
+        posterExists: availableImages.has(file.toLowerCase()),
+        posterSource: named ? 'workbook' : file ? 'first image' : 'none',
+        visible: Boolean(id) && !isNotApplicable(url),
+      };
+    });
 
   // A sheet counts as populated once it has a title AND something to show.
   project.populated = Boolean(
-    project.title && (project.overview.length || project.images.length || project.status)
+    project.title &&
+      (project.overview.some((o) => o.visible) ||
+        project.images.length ||
+        project.videos.some((v) => v.visible) ||
+        project.status)
   );
 
   return project;
@@ -256,8 +410,9 @@ function build() {
   );
 
   const wb = XLSX.read(fs.readFileSync(WORKBOOK), { type: 'buffer' });
+  const catalog = collectSectionCatalog(wb);
   const projects = wb.SheetNames.map((name) =>
-    buildProject(name, readSheetPairs(wb.Sheets[name]), availableImages)
+    buildProject(name, readSheetPairs(wb.Sheets[name]), availableImages, catalog)
   );
 
   assignRouting(projects);
@@ -267,18 +422,48 @@ function build() {
     (a, b) => (a.number ?? 1e9) - (b.number ?? 1e9) || a.variant.localeCompare(b.variant)
   );
 
-  const usedImages = new Set(projects.flatMap((p) => p.images.map((i) => i.file.toLowerCase())));
+  // Poster frames count as used even though no "Image N" row points at them —
+  // otherwise a thumbnail chosen deliberately reads as an orphaned file.
+  const usedImages = new Set(
+    projects.flatMap((p) => [
+      ...p.images.map((i) => i.file.toLowerCase()),
+      ...p.videos.map((v) => v.posterFile.toLowerCase()).filter(Boolean),
+    ])
+  );
 
   return {
     source: path.relative(ROOT, WORKBOOK).replace(/\\/g, '/'),
     projectCount: projects.length,
     populatedCount: projects.filter((p) => p.populated).length,
+    // The catalog is emitted so a reader of the JSON can see the full set of
+    // section titles without having to diff two projects against each other.
+    sectionCatalog: catalog.map((c) => c.label),
+    captionCount: projects.reduce((n, p) => n + p.images.filter((i) => i.caption).length, 0),
     projects,
     warnings: {
       missingImages: projects.flatMap((p) =>
         p.images.filter((i) => !i.exists).map((i) => `${p.sheet}: ${i.file}`)
       ),
       unusedImages: [...availableImages].filter((f) => !usedImages.has(f)),
+      unparsedVideos: projects.flatMap((p) =>
+        p.videos.filter((v) => !v.visible && v.url).map((v) => `${p.sheet}: ${v.url}`)
+      ),
+      // Captions come from the workbook alone, so a sheet with images and no
+      // "Image N Caption" rows ships an uncaptioned gallery. Worth saying out
+      // loud rather than letting it look intentional.
+      uncaptionedSheets: projects
+        .filter((p) => p.images.length && !p.images.some((i) => i.caption))
+        .map((p) => `${p.sheet.trim()} (${p.images.length} image(s))`),
+      pathLikeSections: projects.flatMap((p) =>
+        p.overview
+          .filter((o) => o.visible && looksLikePath(o.text))
+          .map((o) => `${p.sheet.trim()}: section "${o.label}" holds a file path — mistyped media row?`)
+      ),
+      fallbackPosters: projects.flatMap((p) =>
+        p.videos
+          .filter((v) => v.visible && v.posterSource === 'first image')
+          .map((v) => `${p.sheet.trim()}: using ${v.posterFile} — add a "Video Thumbnail" row to choose`)
+      ),
     },
   };
 }
@@ -304,6 +489,11 @@ const img = syncImages();
 console.log(`Wrote ${path.relative(ROOT, OUT_FILE).replace(/\\/g, '/')}`);
 console.log(`  images/ -> public/images/ : ${img.total} file(s), ${img.copied} copied, ${img.removed} removed`);
 console.log(`  ${data.projectCount} sheets — ${data.populatedCount} populated, ${data.projectCount - data.populatedCount} awaiting content`);
+console.log(`  section catalog: ${data.sectionCatalog.length} title(s) carried by every project`);
+const videoCount = data.projects.reduce((n, p) => n + p.videos.filter((v) => v.visible).length, 0);
+console.log(`  ${videoCount} video(s) linked`);
+const imageCount = data.projects.reduce((n, p) => n + p.images.length, 0);
+console.log(`  ${data.captionCount} of ${imageCount} image(s) captioned from the workbook`);
 for (const p of data.projects) {
   const flag = p.populated ? '✓' : '·';
   const parent = p.parentSlug ? `  ↳ under /${p.parentSlug}/` : '';
@@ -316,4 +506,20 @@ if (data.warnings.missingImages.length) {
 if (data.warnings.unusedImages.length) {
   console.log(`  ! ${data.warnings.unusedImages.length} file(s) in images/ referenced by no sheet:`);
   for (const m of data.warnings.unusedImages) console.log(`      ${m}`);
+}
+if (data.warnings.unparsedVideos.length) {
+  console.log(`  ! ${data.warnings.unparsedVideos.length} video link(s) with no recognisable YouTube id:`);
+  for (const m of data.warnings.unparsedVideos) console.log(`      ${m}`);
+}
+if (data.warnings.uncaptionedSheets.length) {
+  console.log(`  ! ${data.warnings.uncaptionedSheets.length} sheet(s) with images but no "Image N Caption" rows:`);
+  for (const m of data.warnings.uncaptionedSheets) console.log(`      ${m}`);
+}
+if (data.warnings.pathLikeSections.length) {
+  console.log(`  ! ${data.warnings.pathLikeSections.length} section(s) publishing a raw file path:`);
+  for (const m of data.warnings.pathLikeSections) console.log(`      ${m}`);
+}
+if (data.warnings.fallbackPosters.length) {
+  console.log(`  ! ${data.warnings.fallbackPosters.length} video(s) with no chosen poster frame:`);
+  for (const m of data.warnings.fallbackPosters) console.log(`      ${m}`);
 }

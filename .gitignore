@@ -11,3 +11,11 @@ public/images/
 
 # Excel lock files
 ~$*.xlsx
+
+# Local safety copies of the workbook — git already versions the live file.
+data/*.old*.xlsx
+data/*.pre-*.xlsx
+
+# Superseded caption source. The build reads captions from the workbook only;
+# this is kept locally for the text it still holds.
+data/image_captions.json

@@ -28,6 +28,29 @@ export function projectHref(project) {
   return url(`/projects/${project.slug}/`);
 }
 
+/**
+ * The N/A rendering rule.
+ *
+ * Every project carries the whole section catalog, so a section this project
+ * has nothing to say about is present in the JSON with the workbook's literal
+ * "N/A" and `visible: false`. The data keeps it; the page never shows it. Route
+ * every read of `overview` and `videos` through these two, or an "N/A" leaks
+ * onto the page as if it were prose.
+ */
+export function sectionsOf(project) {
+  return project.overview.filter((block) => block.visible);
+}
+
+export function videosOf(project) {
+  return (project.videos ?? []).filter((video) => video.visible);
+}
+
+/** First line of real prose — the card blurb and the meta description. */
+export function blurbOf(project) {
+  const sections = sectionsOf(project);
+  return sections.find((s) => s.label === 'What it is')?.text ?? sections[0]?.text ?? '';
+}
+
 /** Sub-pages of a project (1B, 1C… under 1A), in workbook order. */
 export function variantsOf(project) {
   return project.variantSlugs
@@ -66,9 +89,7 @@ export function searchIndex() {
   return projects.map((p) => ({
     title: `${projectCode(p)} — ${projectTitle(p)}`,
     path: projectHref(p),
-    description: p.populated
-      ? p.projectType || p.overview[0]?.text || ''
-      : 'Coming soon',
+    description: p.populated ? p.projectType || blurbOf(p) : 'Coming soon',
     tags: [
       projectCode(p),
       p.short,

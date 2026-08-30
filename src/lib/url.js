@@ -13,10 +13,20 @@ export function url(pathname = '/') {
 
 /**
  * Image filenames come from Excel and contain spaces ("Screenshot 2026-08-13
- * 225235.png"), which are not valid in an href until encoded.
+ * 225235.png") and commas ("Aug 18, 2026, 10_31_34 PM.png"), so they need
+ * encoding before they are valid in an href.
+ *
+ * encodeURI, not encodeURIComponent-per-segment: the latter also escapes
+ * characters that are perfectly legal in a path, notably the comma, and the
+ * static file server behind `astro preview` does not decode a %2C back to a
+ * comma — it 404s on a file that is really there. encodeURI escapes the space
+ * and leaves the comma alone, which both the browser and the server accept.
+ *
+ * It leaves # and ? alone too, and those genuinely must be escaped, or the
+ * browser reads the rest of the filename as a fragment or query string.
  */
 export function assetUrl(pathname = '/') {
-  return url(pathname).split('/').map(encodeURIComponent).join('/');
+  return encodeURI(url(pathname)).replace(/#/g, '%23').replace(/\?/g, '%3F');
 }
 
 /** Compares a link target against the current URL, ignoring trailing slashes. */

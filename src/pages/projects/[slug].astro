@@ -2,11 +2,14 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Icon from '../../components/Icon.astro';
 import Gallery from '../../components/Gallery.astro';
+import VideoOverlay from '../../components/VideoOverlay.astro';
 import {
   projects, projectCode, projectTitle, projectHref,
+  sectionsOf, videosOf, blurbOf,
   variantsOf, parentOf, neighborsOf, SITE_TITLE, AUTHOR,
 } from '../../lib/projects.js';
 import { url } from '../../lib/url.js';
+import { linkify } from '../../lib/text.js';
 
 // One page per workbook sheet. Adding a tab and re-running `npm run data` adds
 // a page here with no code change.
@@ -24,14 +27,20 @@ const parent = parentOf(project);
 const { prev, next } = neighborsOf(project);
 const title = projectTitle(project);
 
+// Sections the workbook marked "N/A" are in the JSON but never on the page —
+// sectionsOf/videosOf apply that rule; nothing below reads .overview directly.
+const sections = sectionsOf(project);
+const videos = videosOf(project);
+
 const facts = [
   { label: 'Status', value: project.status, icon: 'activity' },
+  { label: 'Year Made', value: project.year, icon: 'calendar' },
   { label: 'Project Type', value: project.projectType, icon: 'shapes' },
   { label: 'Role', value: project.role, icon: 'user' },
 ].filter((f) => f.value);
 
 const description = project.populated
-  ? (project.overview.find((o) => o.label === 'What it is')?.text ?? project.overview[0]?.text ?? title).slice(0, 180)
+  ? (blurbOf(project) || title).slice(0, 180)
   : `${title} — write-up in progress.`;
 ---
 <BaseLayout title={`${title} — ${SITE_TITLE}`} description={description} type="article">
@@ -88,13 +97,14 @@ const description = project.populated
     {project.populated ? (
       <>
         <!-- Facts + capability chips -->
+        <!-- Up to four facts now that Year Made is one of them, hence the 2/4 grid -->
         {(facts.length > 0 || project.disciplines.length > 0 || project.tools.length > 0) && (
           <section class="bg-slate-950 border-y border-white/10 py-10">
             <div class="container mx-auto px-4">
               <div class="max-w-4xl mx-auto grid gap-8">
 
                 {facts.length > 0 && (
-                  <dl class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {facts.map((f) => (
                       <div>
                         <dt class="flex items-center gap-2 text-xs uppercase tracking-wide text-gray-500 mb-2">
@@ -143,19 +153,45 @@ const description = project.populated
         )}
 
         <!-- Narrative -->
-        {project.overview.length > 0 && (
+        {sections.length > 0 && (
           <section class="bg-slate-900 py-16">
             <div class="container mx-auto px-4">
               <div class="max-w-3xl mx-auto">
                 <h2 class="text-3xl sm:text-4xl font-bold text-white mb-10">Project Overview</h2>
                 <div class="space-y-10">
-                  {project.overview.map((block) => (
+                  {sections.map((block) => (
                     <div class="border-l-2 border-purple-500/30 pl-6">
                       <h3 class="text-xl font-bold text-white mb-3">{block.label}</h3>
-                      <p class="text-gray-300 leading-relaxed text-base sm:text-lg">{block.text}</p>
+                      <!--
+                        Workbook cells write URLs inline mid-sentence, so the
+                        prose is split into runs and only the URLs become links.
+                        The text runs stay plain values, which Astro escapes.
+                      -->
+                      <p class="text-gray-300 leading-relaxed text-base sm:text-lg">
+                        {linkify(block.text).map((part) => (part.href ? (
+                          <a href={part.href} target="_blank" rel="noopener noreferrer"
+                            class="text-purple-300 underline decoration-purple-400/40 underline-offset-2 break-words hover:text-purple-200 hover:decoration-purple-300 transition-colors">
+                            {part.text}
+                          </a>
+                        ) : part.text))}
+                      </p>
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <!-- Video — above the gallery, since it is the richer look at the build -->
+        {videos.length > 0 && (
+          <section class="bg-slate-950 border-t border-white/10 py-16">
+            <div class="container mx-auto px-4">
+              <div class="max-w-6xl mx-auto">
+                <h2 class="text-3xl sm:text-4xl font-bold text-white mb-8">
+                  {videos.length > 1 ? 'Videos' : 'Video'}
+                </h2>
+                <VideoOverlay videos={videos} title={title} />
               </div>
             </div>
           </section>
@@ -165,7 +201,8 @@ const description = project.populated
         {project.images.length > 0 && (
           <section class="bg-slate-950 border-t border-white/10 py-16">
             <div class="container mx-auto px-4">
-              <div class="max-w-5xl mx-auto">
+              <!-- Wider than the prose above it: the images are the content here -->
+              <div class="max-w-6xl mx-auto">
                 <h2 class="text-3xl sm:text-4xl font-bold text-white mb-8">Gallery</h2>
                 <Gallery images={project.images} title={title} />
               </div>
