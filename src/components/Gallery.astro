@@ -80,15 +80,24 @@ const anyCaption = present.some((i) => i.caption);
     class="absolute top-4 right-4 z-10 p-2.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/15 text-white transition-colors">
     <Icon name="x" size={22} />
   </button>
-  <figure class="relative z-[1] max-w-6xl w-full flex flex-col items-center gap-3">
-    <img id="lightbox-img" src="" alt="" class="max-h-[80vh] w-auto max-w-full rounded-lg shadow-2xl" />
-    <figcaption id="lightbox-caption" class="text-sm text-gray-400 text-center"></figcaption>
+  <figure class="relative z-[1] max-w-6xl flex flex-col items-center">
+    <!--
+      One clipped frame around the image and its caption: rounded-lg + overflow
+      clip round only the outer corners, so the top rides on the image and the
+      bottom rides on the caption with a hard seam between them and no gap. JS
+      sizes this frame to the image's rendered width so the caption tracks it.
+    -->
+    <div id="lightbox-frame" class="max-w-full rounded-lg overflow-hidden shadow-2xl">
+      <img id="lightbox-img" src="" alt="" class="block max-h-[80vh] w-auto max-w-full" />
+      <figcaption id="lightbox-caption" class="w-full text-base text-gray-100 text-center px-4 py-2.5 bg-slate-950 empty:hidden"></figcaption>
+    </div>
   </figure>
 </div>
 
 <script is:inline>
   (function () {
     var box     = document.getElementById('lightbox');
+    var frame   = document.getElementById('lightbox-frame');
     var img     = document.getElementById('lightbox-img');
     var caption = document.getElementById('lightbox-caption');
     var closeBtn = document.getElementById('lightbox-close');
@@ -96,6 +105,20 @@ const anyCaption = present.some((i) => i.caption);
     if (!box || !img) return;
 
     var lastFocused = null;
+
+    // The image is height-capped (max-h-[80vh]), so its rendered width varies
+    // per image and can't be tracked with a CSS-only wrapper. Size the frame to
+    // the image's actual on-screen width so the caption bar tracks it.
+    function syncFrameWidth() {
+      if (!frame) return;
+      var w = img.getBoundingClientRect().width;
+      frame.style.width = w ? Math.round(w) + 'px' : '';
+    }
+
+    img.addEventListener('load', syncFrameWidth);
+    window.addEventListener('resize', function () {
+      if (!box.classList.contains('hidden')) syncFrameWidth();
+    });
 
     function open(src, text) {
       lastFocused = document.activeElement;
@@ -106,6 +129,8 @@ const anyCaption = present.some((i) => i.caption);
       box.classList.add('flex');
       document.body.style.overflow = 'hidden';
       if (closeBtn) closeBtn.focus();
+      // A cached image fires no 'load'; size against it right away.
+      if (img.complete) syncFrameWidth();
     }
 
     function close() {
@@ -113,6 +138,7 @@ const anyCaption = present.some((i) => i.caption);
       box.classList.remove('flex');
       document.body.style.overflow = '';
       img.src = '';
+      if (frame) frame.style.width = '';
       if (lastFocused && lastFocused.focus) lastFocused.focus();
     }
 
