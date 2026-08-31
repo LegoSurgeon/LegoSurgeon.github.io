@@ -52,6 +52,9 @@ import XLSX from 'xlsx';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORKBOOK = path.join(ROOT, 'data', 'Engineering Portfolio.xlsx');
+// Optional second workbook: prose for the pages that aren't projects.
+const EXTRAS = path.join(ROOT, 'data', 'additional-info.xlsx');
+const ABOUT_SHEET = 'About Me';
 const IMAGE_DIR = path.join(ROOT, 'images');
 const OUT_FILE = path.join(ROOT, 'src', 'data', 'projects.json');
 // Astro only serves files under public/, but images/ is the folder you drop
@@ -369,6 +372,101 @@ function assignRouting(projects) {
   return projects;
 }
 
+/* ─────────────────────────────── about ─────────────────────────────────── */
+
+/**
+ * Drafting notes that were left inside an otherwise finished cell — copy about
+ * the copy, addressed to Nick rather than to a reader of the site. They are
+ * dropped from the page and reported, so the fix stays "delete the sentence
+ * from the sheet" rather than "remember the site quietly hides it".
+ *
+ * Matched on a prefix so light edits to the tail of the note still match.
+ * Delete an entry once the sheet no longer contains it.
+ */
+const DRAFTING_NOTES = ['I think this works well because'];
+
+/**
+ * data/additional-info.xlsx, sheet "About Me" — the same column A / column B
+ * shape as a project sheet, but the values are prose sections rather than
+ * fields. A cell that is one line of "·"-separated terms becomes a chip list;
+ * anything else is split into paragraphs on blank lines.
+ */
+/**
+ * The About content already written to src/data/projects.json, which is
+ * committed. additional-info.xlsx is not — it carries a personal email address
+ * and phone number — so on any machine without it this is the only copy.
+ * Without this, `npm run build` would regenerate the JSON and silently blank
+ * the About page on a fresh clone.
+ */
+function previousAbout() {
+  try {
+    return JSON.parse(fs.readFileSync(OUT_FILE, 'utf8')).about ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function readAbout() {
+  const warnings = [];
+
+  if (!fs.existsSync(EXTRAS)) {
+    const kept = previousAbout();
+    warnings.push(
+      kept
+        ? `${path.basename(EXTRAS)} not present — kept the about content already in projects.json`
+        : `${path.basename(EXTRAS)} not present and no about content in projects.json — about page will be bare`
+    );
+    return { about: kept, warnings };
+  }
+
+  const wb = XLSX.read(fs.readFileSync(EXTRAS), { type: 'buffer' });
+  const sheet = wb.Sheets[ABOUT_SHEET];
+  if (!sheet) {
+    warnings.push(`${path.basename(EXTRAS)} has no "${ABOUT_SHEET}" sheet — about page left empty`);
+    return { about: null, warnings };
+  }
+
+  // Blank lines separate paragraphs, so the raw cell is read rather than the
+  // whitespace-collapsed norm() used everywhere else.
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: null });
+  const sections = [];
+
+  for (const row of rows) {
+    const label = norm(row?.[0]);
+    const raw = String(row?.[1] ?? '').trim();
+    if (!label || !raw || isNotApplicable(raw)) continue;
+
+    let paragraphs = raw
+      .split(/\r?\n\s*\r?\n/)
+      .map((p) => p.replace(/\s*\r?\n\s*/g, ' ').trim())
+      .filter(Boolean);
+
+    const kept = paragraphs.filter(
+      (p) => !DRAFTING_NOTES.some((note) => p.startsWith(note))
+    );
+    if (kept.length !== paragraphs.length) {
+      warnings.push(`"${ABOUT_SHEET}" → ${label}: dropped a drafting note left in the cell`);
+      paragraphs = kept;
+    }
+    if (!paragraphs.length) continue;
+
+    // "A · B · C" on one line is a term list, not a sentence.
+    const single = paragraphs.length === 1 ? paragraphs[0] : '';
+    const items = single.includes('·')
+      ? single.split('·').map(norm).filter(Boolean)
+      : [];
+
+    sections.push({ label, paragraphs, items });
+  }
+
+  if (!sections.length) warnings.push(`"${ABOUT_SHEET}" sheet is empty`);
+
+  return {
+    about: { source: path.relative(ROOT, EXTRAS).replace(/\\/g, '/'), sections },
+    warnings,
+  };
+}
+
 /** Mirror images/ into public/images/, copying only what changed. */
 function syncImages() {
   fs.mkdirSync(PUBLIC_IMAGE_DIR, { recursive: true });
@@ -417,6 +515,8 @@ function build() {
 
   assignRouting(projects);
 
+  const aboutData = readAbout();
+
   // Workbook order drives site order: number, then variant letter.
   projects.sort(
     (a, b) => (a.number ?? 1e9) - (b.number ?? 1e9) || a.variant.localeCompare(b.variant)
@@ -439,6 +539,7 @@ function build() {
     // section titles without having to diff two projects against each other.
     sectionCatalog: catalog.map((c) => c.label),
     captionCount: projects.reduce((n, p) => n + p.images.filter((i) => i.caption).length, 0),
+    about: aboutData.about,
     projects,
     warnings: {
       missingImages: projects.flatMap((p) =>
@@ -464,6 +565,7 @@ function build() {
           .filter((v) => v.visible && v.posterSource === 'first image')
           .map((v) => `${p.sheet.trim()}: using ${v.posterFile} — add a "Video Thumbnail" row to choose`)
       ),
+      about: aboutData.warnings,
     },
   };
 }
@@ -514,6 +616,13 @@ if (data.warnings.unparsedVideos.length) {
 if (data.warnings.uncaptionedSheets.length) {
   console.log(`  ! ${data.warnings.uncaptionedSheets.length} sheet(s) with images but no "Image N Caption" rows:`);
   for (const m of data.warnings.uncaptionedSheets) console.log(`      ${m}`);
+}
+if (data.about) {
+  console.log(`  ${data.about.source} -> about page: ${data.about.sections.length} section(s)`);
+}
+if (data.warnings.about.length) {
+  console.log(`  ! ${data.warnings.about.length} about-page note(s):`);
+  for (const m of data.warnings.about) console.log(`      ${m}`);
 }
 if (data.warnings.pathLikeSections.length) {
   console.log(`  ! ${data.warnings.pathLikeSections.length} section(s) publishing a raw file path:`);

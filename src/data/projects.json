@@ -48,9 +48,71 @@
     "Bricklink Page",
     "Truss Structure & Assembly",
     "Hand Fabrication and Mechanism Development",
+    "Accolades",
     "Why I worked on it"
   ],
-  "captionCount": 115,
+  "captionCount": 118,
+  "about": {
+    "source": "data/additional-info.xlsx",
+    "sections": [
+      {
+        "label": "About me",
+        "paragraphs": [
+          "I’m Nick, a high school engineering student focused on mechanical design, robotics, mechatronics, and physical product development. I’m most interested in problems where geometry, motion, packaging, manufacturing, electronics, and user experience all have to work together.",
+          "I started designing mechanisms long before I had access to CAD or a 3D printer, experimenting with LEGO Transformers, puzzle boxes, and hand-built projects. As my tools improved, those same interests grew into fully original transforming figures, competition robots, custom electronics, mechanical puzzles, and products designed for real users.",
+          "I’m also a member of FIRST Tech Challenge Team 23268 Ultraviolet, a three-person robotics team where I work across CAD, fabrication, assembly, programming, prototyping, and testing. Working on competition robots has taught me that a design is never finished just because it works in CAD; it has to survive manufacturing, real hardware, unpredictable conditions, and the people using it."
+        ],
+        "items": []
+      },
+      {
+        "label": "How I design",
+        "paragraphs": [
+          "I tend to obsess over making every part earn its place. I like compact mechanisms, clean packaging, serviceable systems, and designs where the complexity is hidden well enough that the final result feels obvious.",
+          "My process usually involves a lot of iteration: build something, find what I overlooked, understand why it failed, and redesign it until the solution becomes simpler and more intentional. I care about making things work, but I also care about making them understandable, durable, and worth looking at twice."
+        ],
+        "items": []
+      },
+      {
+        "label": "Areas I'm interested in",
+        "paragraphs": [
+          "Mechanical design · Robotics · Mechatronics · Product design · Mechanism design · CAD & surface modeling · Rapid prototyping · PCB design · Computer vision"
+        ],
+        "items": [
+          "Mechanical design",
+          "Robotics",
+          "Mechatronics",
+          "Product design",
+          "Mechanism design",
+          "CAD & surface modeling",
+          "Rapid prototyping",
+          "PCB design",
+          "Computer vision"
+        ]
+      },
+      {
+        "label": "Tools",
+        "paragraphs": [
+          "Fusion 360 · Blender · KiCad · FDM 3D Printing · FTC SDK · OpenCV · TensorFlow"
+        ],
+        "items": [
+          "Fusion 360",
+          "Blender",
+          "KiCad",
+          "FDM 3D Printing",
+          "FTC SDK",
+          "OpenCV",
+          "TensorFlow"
+        ]
+      },
+      {
+        "label": "What Im working toward",
+        "paragraphs": [
+          "I don’t know exactly what form my work will take in the future, but I want to keep taking harder physical problems and turning them into systems that are useful, deliberate, and elegantly engineered."
+        ],
+        "items": []
+      }
+    ]
+  },
   "projects": [
     {
       "sheet": "1A. MK2 Modular Chassis",
@@ -300,6 +362,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         },
@@ -597,6 +664,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -871,6 +943,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         },
@@ -1169,6 +1246,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -1452,6 +1534,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         },
@@ -1771,6 +1858,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -2085,6 +2177,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -2174,6 +2271,13 @@
           "src": "/images/20260827_224344.jpg",
           "exists": true,
           "caption": "Physical Prototype Robot Mode Front"
+        },
+        {
+          "index": 13,
+          "file": "20250730_090903.jpg",
+          "src": "/images/20250730_090903.jpg",
+          "exists": true,
+          "caption": "It All Starts On Paper"
         }
       ],
       "videos": [
@@ -2445,6 +2549,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -2540,6 +2649,11 @@
         {
           "label": "What I learned",
           "text": "This project taught me that modularity is primarily an interface problem. Separating a machine into pieces is easy; making those pieces reconnect mechanically and electrically in a predictable way requires much more deliberate design.",
+          "visible": true
+        },
+        {
+          "label": "Accolades",
+          "text": "This chassis won a 'You Inspire Me' pin from a judge at the 2026 FTC World Championship. Each judge only has one such pin to give making it very rare.",
           "visible": true
         },
         {
@@ -3044,6 +3158,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -3342,6 +3461,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -3629,6 +3753,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         },
@@ -3971,6 +4100,11 @@
           "label": "Hand Fabrication and Mechanism Development",
           "text": "N/A",
           "visible": false
+        },
+        {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
         }
       ],
       "images": [
@@ -4067,6 +4201,11 @@
         {
           "label": "Manufacturing, Assembly & Testing",
           "text": "Because Ultraviolet remained a three-person team, I worked across nearly every stage of bringing the robot from CAD to competition hardware. I produced FDM-printed components, helped fabricate laser-cut polycarbonate and waterjet-cut aluminum parts, assembled mechanisms, and repeatedly tested revisions as the robot evolved. Much of my contribution came through this iteration loop rather than ownership of complete subsystems. I helped identify mechanical failures, adjust CAD, rebuild assemblies, and validate whether changes actually improved performance. The completed robot ultimately ranked 119th worldwide, placing it within approximately the top 2% of FTC teams.",
+          "visible": true
+        },
+        {
+          "label": "Accolades",
+          "text": "The completed robot ultimately ranked 119th worldwide, placing it within approximately the top 2% of FTC teams.",
           "visible": true
         },
         {
@@ -4360,7 +4499,12 @@
         },
         {
           "label": "Testing, Manufacturing, and Competition",
-          "text": "Because Ultraviolet had only three members, testing often crossed normal role boundaries. I helped manufacture and assemble parts, test subsystem changes, identify mechanical and software bugs, and make smaller CAD revisions as issues appeared. That process gave me experience contributing effectively even when I was not leading the overall mechanical design. I learned to understand an existing system quickly, find where I could add value, and work through problems collaboratively rather than needing ownership of the complete design. The season ultimately resulted in Ultraviolet ranking 4th in the world, making Tuzik one of the highest-performing robots I had worked on at that point.",
+          "text": "Because Ultraviolet had only three members, testing often crossed normal role boundaries. I helped manufacture and assemble parts, test subsystem changes, identify mechanical and software bugs, and make smaller CAD revisions as issues appeared. That process gave me experience contributing effectively even when I was not leading the overall mechanical design. I learned to understand an existing system quickly, find where I could add value, and work through problems collaboratively rather than needing ownership of the complete design.",
+          "visible": true
+        },
+        {
+          "label": "Accolades",
+          "text": "The completed robot ultimately ranked 4th worldwide out of over 8,000 teams.",
           "visible": true
         },
         {
@@ -4575,6 +4719,20 @@
           "src": "/images/Screenshot 2026-08-28 195414.png",
           "exists": true,
           "caption": "In Action"
+        },
+        {
+          "index": 4,
+          "file": "20241205_194132.jpg",
+          "src": "/images/20241205_194132.jpg",
+          "exists": true,
+          "caption": "Physical Robot"
+        },
+        {
+          "index": 5,
+          "file": "20250104_135938.jpg",
+          "src": "/images/20250104_135938.jpg",
+          "exists": true,
+          "caption": "On Competition Field"
         }
       ],
       "videos": [],
@@ -4829,6 +4987,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         },
@@ -5134,6 +5297,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -5428,6 +5596,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         },
@@ -5739,6 +5912,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -6013,6 +6191,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         },
@@ -6321,6 +6504,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -6598,6 +6786,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         }
@@ -6886,6 +7079,11 @@
           "visible": false
         },
         {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
+        },
+        {
           "label": "Why I worked on it",
           "text": "N/A",
           "visible": false
@@ -7163,6 +7361,11 @@
         },
         {
           "label": "Hand Fabrication and Mechanism Development",
+          "text": "N/A",
+          "visible": false
+        },
+        {
+          "label": "Accolades",
           "text": "N/A",
           "visible": false
         }
@@ -7448,6 +7651,11 @@
           "label": "Truss Structure & Assembly",
           "text": "N/A",
           "visible": false
+        },
+        {
+          "label": "Accolades",
+          "text": "N/A",
+          "visible": false
         }
       ],
       "images": [
@@ -7495,6 +7703,9 @@
     "unparsedVideos": [],
     "uncaptionedSheets": [],
     "pathLikeSections": [],
-    "fallbackPosters": []
+    "fallbackPosters": [],
+    "about": [
+      "\"About Me\" → What Im working toward: dropped a drafting note left in the cell"
+    ]
   }
 }

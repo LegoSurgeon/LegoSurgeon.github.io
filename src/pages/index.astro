@@ -3,18 +3,36 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import {
-  projects, projectCount, populatedCount,
+  projects, projectCount,
   projectCode, projectTitle, projectHref,
   AUTHOR, SITE_TITLE,
 } from '../lib/projects.js';
 import { url } from '../lib/url.js';
 
-// Lead with documented work; fall back to workbook order before anything is
-// written so the home page is never empty.
-const featured = (projects.filter((p) => p.populated).length
-  ? projects.filter((p) => p.populated)
-  : projects
-).slice(0, 3);
+// Hand-picked rather than "first three documented", and ordered deliberately —
+// each earns its slot for a different reason, so together they show range
+// instead of three variations on one theme:
+//
+//   8   4th in the world, 2025 FTC Championship
+//   4A  "You Inspire Me" judge's pin, 2026 FTC World Championship
+//   6   AI vision model trained for the robot
+//   1A  the latest engineering work
+//   1E  electrical engineering — PCB fabrication
+//   2   the most advanced transformer design
+//
+// Codes are the workbook's own ("1A", "8"), so renumbering a sheet changes what
+// appears here. Any code that no longer resolves is dropped and the grid is
+// topped up from workbook order, so the home page can never come out short.
+const FEATURED_CODES = ['8', '4A', '6', '1A', '1E', '2'];
+
+const picked = FEATURED_CODES
+  .map((code) => projects.find((p) => projectCode(p) === code))
+  .filter(Boolean);
+
+const featured = [
+  ...picked,
+  ...projects.filter((p) => p.populated && !picked.includes(p)),
+].slice(0, FEATURED_CODES.length);
 
 const disciplines = [...new Set(projects.flatMap((p) => p.disciplines))];
 const tools = [...new Set(projects.flatMap((p) => p.tools))];
@@ -93,8 +111,10 @@ const tools = [...new Set(projects.flatMap((p) => p.tools))];
           <div class="flex flex-wrap items-end justify-between gap-4 mb-10">
             <div>
               <h2 class="text-3xl sm:text-4xl font-bold text-white">Featured Work</h2>
+              <!-- Was a documented-vs-total count, which now prints the same
+                   number twice and says nothing. -->
               <p class="text-gray-400 mt-2">
-                {populatedCount} of {projectCount} projects documented so far.
+                {featured.length} projects that best show the range of the work.
               </p>
             </div>
             <a href={url('/projects/')} class="inline-flex items-center gap-2 text-purple-300 hover:text-purple-200 font-semibold text-sm transition-colors">

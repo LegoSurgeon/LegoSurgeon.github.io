@@ -13,6 +13,17 @@ export const projects = data.projects;
 export const projectCount = data.projectCount;
 export const populatedCount = data.populatedCount;
 
+/**
+ * About-page prose, from the "About Me" sheet of data/additional-info.xlsx.
+ * Sections carry `paragraphs`, and a "·"-separated one-liner also carries
+ * `items` so it can render as chips instead of a sentence.
+ */
+export const about = data.about ?? { sections: [] };
+export const aboutSections = about.sections ?? [];
+
+/** LinkedIn is the one public contact channel the site advertises. */
+export const LINKEDIN_URL = 'https://www.linkedin.com/in/nicholas-paradizov-b131a7357/';
+
 /** "1A", "1B", "2" — the workbook's own label for a sheet. */
 export function projectCode(project) {
   if (project.number === null) return '—';

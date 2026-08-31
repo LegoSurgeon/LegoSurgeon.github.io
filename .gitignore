@@ -19,3 +19,9 @@ data/*.pre-*.xlsx
 # Superseded caption source. The build reads captions from the workbook only;
 # this is kept locally for the text it still holds.
 data/image_captions.json
+
+# Holds a personal email address and phone number in its footer spec, so it is
+# deliberately kept out of the repository. The About-page prose it supplies is
+# already baked into src/data/projects.json, and build-data.mjs carries that
+# content forward when this file is absent rather than blanking the page.
+data/additional-info.xlsx

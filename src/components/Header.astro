@@ -80,6 +80,11 @@ const index = searchIndex();
               <span class="nav-grad-text">About</span>
             </a>
 
+            <a href={url('/contact/')}
+              class={`nav-desktop-link px-3 py-2 rounded-lg text-base font-medium transition-all duration-200 ${isActive(currentPath, url('/contact/')) ? 'nav-desktop-link--active bg-white/[0.08]' : ''}`}>
+              <span class="nav-grad-text">Contact</span>
+            </a>
+
             <div class="w-px h-5 bg-white/10 mx-1 flex-shrink-0"></div>
           </div>
 
@@ -146,6 +151,10 @@ const index = searchIndex();
 
         <a href={url('/about/')} class="py-3 border-b border-white/8 text-white">
           <span class="text-3xl sm:text-4xl font-bold tracking-tight" data-nav-text>About</span>
+        </a>
+
+        <a href={url('/contact/')} class="py-3 border-b border-white/8 text-white">
+          <span class="text-3xl sm:text-4xl font-bold tracking-tight" data-nav-text>Contact</span>
         </a>
 
         <button id="search-open-mobile" type="button"

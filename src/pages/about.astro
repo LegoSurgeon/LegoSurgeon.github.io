@@ -1,24 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import { projects, projectCount, populatedCount, AUTHOR, SITE_TITLE } from '../lib/projects.js';
+import { projects, projectCount, aboutSections, AUTHOR, SITE_TITLE } from '../lib/projects.js';
 import { url } from '../lib/url.js';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// PLACEHOLDER COPY — edit these three fields with Nicholas's own words.
-// Everything below them is generated from the workbook and needs no editing.
-// ─────────────────────────────────────────────────────────────────────────────
-const bio = [
-  `${AUTHOR} designs and builds mechanical and mechatronic systems — from FIRST Tech
-   Challenge robotics drivetrains to custom tooling, enclosures, and embedded electronics.`,
-  `This portfolio documents each project the same way: what it is, why it was made,
-   what was designed, the central engineering challenge, and what the work taught.`,
+// Every word below comes from the "About Me" sheet of additional-info.xlsx —
+// edit the workbook, re-run `npm run data`, and this page follows.
+//
+// The opening section leads the hero; the rest becomes the body. Sections whose
+// cell was a single "·"-separated line arrive with `items` and render as chips.
+const [lead, ...rest] = aboutSections;
+const leadParagraphs = lead?.paragraphs ?? [];
+const [hook, ...leadRest] = leadParagraphs;
+
+const bodySections = [
+  ...(leadRest.length ? [{ label: lead.label, paragraphs: leadRest, items: [] }] : []),
+  ...rest,
 ];
-const contact = [
-  // { label: 'Email',    value: 'you@example.com', href: 'mailto:you@example.com', icon: 'mail' },
-  // { label: 'LinkedIn', value: 'linkedin.com/in/…', href: 'https://…',            icon: 'linkedin' },
-];
-// ─────────────────────────────────────────────────────────────────────────────
+
+const prose = bodySections.filter((s) => !s.items.length);
+const lists = bodySections.filter((s) => s.items.length);
 
 const disciplines = [...new Set(projects.flatMap((p) => p.disciplines))].sort((a, b) => a.localeCompare(b));
 const tools = [...new Set(projects.flatMap((p) => p.tools))].sort((a, b) => a.localeCompare(b));
@@ -51,9 +52,9 @@ const method = [
               {AUTHOR}
             </span>
           </h1>
-          {bio.map((para) => (
-            <p class="text-base sm:text-lg text-gray-300 leading-relaxed mb-4">{para}</p>
-          ))}
+          {hook && (
+            <p class="text-base sm:text-lg text-gray-300 leading-relaxed">{hook}</p>
+          )}
         </div>
       </div>
     </section>
@@ -66,16 +67,63 @@ const method = [
             <p class="text-gray-400 text-xs sm:text-sm mt-2">Projects</p>
           </div>
           <div>
-            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{populatedCount}</p>
-            <p class="text-gray-400 text-xs sm:text-sm mt-2">Documented</p>
-          </div>
-          <div>
             <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{disciplines.length}</p>
             <p class="text-gray-400 text-xs sm:text-sm mt-2">Disciplines</p>
+          </div>
+          <div>
+            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{tools.length}</p>
+            <p class="text-gray-400 text-xs sm:text-sm mt-2">Tools</p>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Prose sections from the "About Me" sheet, in sheet order -->
+    {prose.length > 0 && (
+      <section class="bg-slate-900 py-16">
+        <div class="container mx-auto px-4">
+          <div class="max-w-3xl mx-auto space-y-12">
+            {prose.map((section) => (
+              <div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mb-5">{section.label}</h2>
+                <div class="space-y-4">
+                  {section.paragraphs.map((para) => (
+                    <p class="text-gray-300 leading-relaxed text-base sm:text-lg">{para}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <!-- "·"-separated cells: his own interest and tool lists, as chips -->
+    {lists.length > 0 && (
+      <section class="bg-slate-950 border-y border-white/10 py-14">
+        <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
+            {lists.map((section, i) => (
+              <div>
+                <h2 class="flex items-center gap-2 text-xl font-bold text-white mb-5">
+                  <Icon name={i === 0 ? 'compass' : 'wrench'} size={18} class={i === 0 ? 'text-purple-400' : 'text-blue-400'} />
+                  {section.label}
+                </h2>
+                <ul class="flex flex-wrap gap-2">
+                  {section.items.map((item) => (
+                    <li class={`text-sm px-3 py-1.5 rounded-lg border ${
+                      i === 0
+                        ? 'bg-purple-500/10 border-purple-400/25 text-purple-200'
+                        : 'bg-blue-500/10 border-blue-400/25 text-blue-200'
+                    }`}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
 
     <section class="bg-slate-900 py-16">
       <div class="container mx-auto px-4">
@@ -100,15 +148,25 @@ const method = [
     </section>
 
     {(disciplines.length > 0 || tools.length > 0) && (
+      <!--
+        Tallied from the project sheets, so it overlaps the lists above without
+        repeating them: those are what he works in, this is what the 25 projects
+        actually used. The heading is what keeps the two from reading as a
+        duplicate of each other.
+      -->
       <section class="bg-slate-950 border-t border-white/10 py-16">
         <div class="container mx-auto px-4">
+          <div class="max-w-4xl mx-auto">
+            <h2 class="text-xl font-bold text-white mb-2">Across the Projects</h2>
+            <p class="text-sm text-gray-500 mb-8">Every discipline and tool named by the {projectCount} project write-ups.</p>
+          </div>
           <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10">
             {disciplines.length > 0 && (
               <div>
-                <h2 class="flex items-center gap-2 text-xl font-bold text-white mb-5">
+                <h3 class="flex items-center gap-2 text-base font-bold text-white mb-5">
                   <Icon name="compass" size={18} class="text-purple-400" />
                   Disciplines
-                </h2>
+                </h3>
                 <ul class="flex flex-wrap gap-2">
                   {disciplines.map((d) => (
                     <li class="text-sm px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-400/25 text-purple-200">{d}</li>
@@ -118,10 +176,10 @@ const method = [
             )}
             {tools.length > 0 && (
               <div>
-                <h2 class="flex items-center gap-2 text-xl font-bold text-white mb-5">
+                <h3 class="flex items-center gap-2 text-base font-bold text-white mb-5">
                   <Icon name="wrench" size={18} class="text-blue-400" />
                   Tools
-                </h2>
+                </h3>
                 <ul class="flex flex-wrap gap-2">
                   {tools.map((t) => (
                     <li class="text-sm px-3 py-1.5 rounded-lg bg-blue-500/10 border border-blue-400/25 text-blue-200">{t}</li>
@@ -142,24 +200,18 @@ const method = [
             {projectCount} projects spanning robotics, mechatronics, tooling, and mechanical design.
           </p>
 
-          {contact.length > 0 && (
-            <ul class="flex flex-wrap justify-center gap-4 mb-8">
-              {contact.map((c) => (
-                <li>
-                  <a href={c.href} class="inline-flex items-center gap-2 text-purple-300 hover:text-purple-200 text-sm transition-colors">
-                    <Icon name={c.icon} size={16} />
-                    {c.value}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <a href={url('/projects/')}
-            class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg">
-            <span>Browse All Projects</span>
-            <Icon name="arrow-right" size={20} />
-          </a>
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href={url('/projects/')}
+              class="inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300 hover:scale-105 shadow-lg">
+              <span>Browse All Projects</span>
+              <Icon name="arrow-right" size={20} />
+            </a>
+            <a href={url('/contact/')}
+              class="inline-flex items-center gap-2 border border-white/15 hover:border-purple-400/40 hover:bg-white/5 text-white px-8 py-4 rounded-lg font-semibold transition-all duration-300">
+              <span>Get in Touch</span>
+              <Icon name="arrow-right" size={20} class="text-purple-400" />
+            </a>
+          </div>
         </div>
       </div>
     </section>
