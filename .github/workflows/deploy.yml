@@ -26,6 +26,9 @@ jobs:
       # workbook, then `astro build`) and uploads dist/ as the Pages artifact.
       - name: Build with Astro
         uses: withastro/action@v3
+        with:
+          # Astro 6 requires Node >=22.12; the action defaults to 20.
+          node-version: 22
         env:
           # User site lives at the domain root, so base stays '/'.
           SITE_URL: https://legosurgeon.github.io
