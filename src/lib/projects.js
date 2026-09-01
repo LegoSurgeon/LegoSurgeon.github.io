@@ -11,6 +11,8 @@ export const SITE_TITLE = 'The Engineering Portfolio';
 export const projects = data.projects;
 
 export const projectCount = data.projectCount;
+/** Distinct projects — variant sheets (1A, 1B…) collapse to one. */
+export const projectGroupCount = data.projectGroupCount;
 export const populatedCount = data.populatedCount;
 
 /**
@@ -73,6 +75,22 @@ export function parentOf(project) {
   return project.parentSlug
     ? projects.find((p) => p.slug === project.parentSlug) ?? null
     : null;
+}
+
+/**
+ * Cross-links between projects that aren't variants of one another but are worth
+ * seeing side by side — e.g. the two generations of the Ratchet build. Keyed by
+ * slug; the values are slugs, and the link is one-directional unless listed both
+ * ways.
+ */
+const SEE_ALSO = {
+  'idw-ratchet-mk2': ['idw-ratchet-mk1'],
+};
+
+export function seeAlsoOf(project) {
+  return (SEE_ALSO[project.slug] ?? [])
+    .map((slug) => projects.find((p) => p.slug === slug))
+    .filter(Boolean);
 }
 
 /** Prev/next across the flat workbook order, for footer navigation. */

@@ -4,13 +4,10 @@ import Icon from '../../components/Icon.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { projects, projectCount, populatedCount, AUTHOR, SITE_TITLE } from '../../lib/projects.js';
 
-// Filter chips are derived from the data, so a new discipline in the workbook
-// becomes a filter without touching this file.
-//
-// Ordered by how many projects carry each one rather than alphabetically: 25 of
-// the 42 disciplines appear on a single project, so an A–Z wall buries the
-// filters worth clicking among ones that return one card. The frequent few are
-// shown; the rest sit behind a toggle.
+// Filter chips are derived from the data. build-data.mjs folds the workbook's
+// many raw disciplines into a fixed set of ten, so this is a short, stable list
+// that fits one row — ordered by how many projects carry each so the busiest
+// filters lead.
 const disciplineCounts = new Map();
 for (const p of projects) {
   for (const d of p.disciplines) disciplineCounts.set(d, (disciplineCounts.get(d) ?? 0) + 1);
@@ -18,9 +15,6 @@ for (const p of projects) {
 const disciplines = [...disciplineCounts.keys()].sort(
   (a, b) => disciplineCounts.get(b) - disciplineCounts.get(a) || a.localeCompare(b)
 );
-
-const PRIMARY_FILTERS = 8;
-const hiddenFilterCount = Math.max(0, disciplines.length - PRIMARY_FILTERS);
 
 // The "written up so far" count only means something while sheets are still
 // blank. With every project documented it just prints the same number twice,
@@ -69,8 +63,7 @@ const cards = projects.map((p) => ({
 
     <!--
       Sticky, so its height is spent on every screen for the whole page. Kept to
-      a search field and one or two rows of chips; the rest expand on demand
-      into a bounded, scrollable area so the bar can never grow past ~2 rows.
+      a search field and a single short row of discipline chips.
     -->
     <section class="bg-slate-950 border-t border-white/10 py-4 sticky top-[64px] z-[100] backdrop-blur-xl bg-slate-950/85">
       <div class="container mx-auto px-4">
@@ -85,27 +78,17 @@ const cards = projects.map((p) => ({
               class="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-2.5 text-white placeholder-gray-500 text-sm outline-none focus:border-purple-400/50 focus:bg-white/[0.07] transition-colors" />
           </div>
 
-          <div class="flex items-start gap-2">
-            <div id="catalog-filters" class="is-collapsed flex-1 flex flex-wrap gap-2 items-center">
-              <button type="button" data-filter="" aria-pressed="true"
-                class="catalog-chip is-active text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors">
-                All
+          <div id="catalog-filters" class="flex flex-wrap gap-2 items-center">
+            <button type="button" data-filter="" aria-pressed="true"
+              class="catalog-chip is-active text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors">
+              All
+            </button>
+            {disciplines.map((d) => (
+              <button type="button" data-filter={d.toLowerCase()} aria-pressed="false"
+                class="catalog-chip text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors">
+                {d}
               </button>
-              {disciplines.map((d, i) => (
-                <button type="button" data-filter={d.toLowerCase()} aria-pressed="false"
-                  class={`catalog-chip text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${i >= PRIMARY_FILTERS ? 'chip-extra' : ''}`}>
-                  {d}
-                </button>
-              ))}
-            </div>
-
-            {hiddenFilterCount > 0 && (
-              <button id="filters-toggle" type="button" aria-expanded="false" aria-controls="catalog-filters"
-                class="flex-shrink-0 inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full border border-purple-400/30 bg-purple-500/10 text-purple-200 hover:bg-purple-500/20 hover:border-purple-400/50 transition-colors">
-                <span data-more={`+${hiddenFilterCount} more`}>+{hiddenFilterCount} more</span>
-                <Icon name="chevron-down" size={13} class="filters-chevron transition-transform duration-200" />
-              </button>
-            )}
+            ))}
           </div>
 
         </div>
@@ -147,31 +130,6 @@ const cards = projects.map((p) => ({
       border-color: transparent;
       color: #fff;
     }
-
-    /* Collapsed: only the frequent disciplines show. `:not(.is-active)` keeps a
-       chip picked from the expanded list visible after collapsing, so the bar
-       never claims "All" while a narrower filter is still applied. */
-    #catalog-filters.is-collapsed .chip-extra:not(.is-active) { display: none; }
-
-    /* Expanded: bounded and scrollable, so 42 chips can't push the grid off
-       screen on a phone. The scrollbar is the cue that there is more. */
-    #catalog-filters:not(.is-collapsed) {
-      max-height: 7.5rem;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(192,132,252,0.35) transparent;
-    }
-    #catalog-filters:not(.is-collapsed)::-webkit-scrollbar { width: 6px; }
-    #catalog-filters:not(.is-collapsed)::-webkit-scrollbar-thumb {
-      background: rgba(192,132,252,0.35);
-      border-radius: 3px;
-    }
-
-    #filters-toggle[aria-expanded='true'] .filters-chevron { transform: rotate(180deg); }
-
-    @media (prefers-reduced-motion: reduce) {
-      .filters-chevron { transition: none !important; }
-    }
   </style>
 
   <script is:inline>
@@ -203,19 +161,6 @@ const cards = projects.map((p) => ({
         });
 
         if (empty) empty.classList.toggle('hidden', shown > 0);
-      }
-
-      // Expand / collapse the discipline overflow.
-      var filters = document.getElementById('catalog-filters');
-      var toggle  = document.getElementById('filters-toggle');
-      if (filters && toggle) {
-        var label = toggle.querySelector('[data-more]');
-        toggle.addEventListener('click', function () {
-          var collapsed = filters.classList.toggle('is-collapsed');
-          toggle.setAttribute('aria-expanded', String(!collapsed));
-          if (label) label.textContent = collapsed ? label.getAttribute('data-more') : 'Show less';
-          if (collapsed) filters.scrollTop = 0;
-        });
       }
 
       chips.forEach(function (chip) {

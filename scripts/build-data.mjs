@@ -112,6 +112,183 @@ const slugify = (s) =>
     .replace(/^-+|-+$/g, '');
 
 /**
+ * The workbook tags each project with a discipline per nuance — "Sequential
+ * Mechanisms", "Design for Assembly", "Robotics Programming" — which scattered
+ * 25+ single-use chips across the catalog filter. Every raw value folds into
+ * this fixed set of ten.
+ *
+ * A raw value mapping to '' is dropped rather than shown (the Testing* rows and
+ * "Thermal Consideration": accurate on a sheet, but not an axis anyone browses
+ * by). A raw value in neither the map nor the canonical list is kept verbatim
+ * and reported, so a new workbook entry surfaces as a TODO instead of vanishing.
+ */
+const DISCIPLINES = [
+  'Mechanical Design',
+  'Robotics',
+  'Mechatronics',
+  'Product Design',
+  'CAD',
+  'Electronics/PCB',
+  'Computer Vision',
+  'Manufacturing',
+  'Rapid Prototyping',
+  'Embedded Systems',
+];
+
+const DISCIPLINE_MAP = {
+  'mechanical design': 'Mechanical Design',
+  'mechanism design': 'Mechanical Design',
+  'sequential mechanisms': 'Mechanical Design',
+  'clamping mechanisms': 'Mechanical Design',
+  'kinematics': 'Mechanical Design',
+  'packaging': 'Mechanical Design',
+  'spatial packaging': 'Mechanical Design',
+  'structural design': 'Mechanical Design',
+  'transformation design': 'Mechanical Design',
+  'design for serviceability': 'Mechanical Design',
+  'robotics': 'Robotics',
+  'modular robotics': 'Robotics',
+  'robotics programming': 'Robotics',
+  'autonomous programming': 'Robotics',
+  'mechatronics': 'Mechatronics',
+  'sensor integration': 'Mechatronics',
+  'product design': 'Product Design',
+  'user experience': 'Product Design',
+  'puzzle design': 'Product Design',
+  'character adaptation': 'Product Design',
+  'design for user protection': 'Product Design',
+  'lego technic/system building': 'Product Design',
+  'cad': 'CAD',
+  'surface modeling': 'CAD',
+  'pcb design': 'Electronics/PCB',
+  'computer vision': 'Computer Vision',
+  'machine learning': 'Computer Vision',
+  'dataset design': 'Computer Vision',
+  'manufacturing': 'Manufacturing',
+  'design for manufacturing': 'Manufacturing',
+  'design for assembly': 'Manufacturing',
+  'assembly planning': 'Manufacturing',
+  'structural assembly': 'Manufacturing',
+  'fdm manufacturing': 'Manufacturing',
+  'fabrication': 'Manufacturing',
+  'hand fabrication': 'Manufacturing',
+  'rapid prototyping': 'Rapid Prototyping',
+  'embedded programming': 'Embedded Systems',
+  'testing': '',
+  'testing & iteration': '',
+  'testing & validation': '',
+  'thermal consideration': '',
+};
+
+// Raw discipline cells seen this run that the map doesn't cover — reported once
+// at the end so an unmapped value is a visible TODO, not a silent passthrough.
+const unmappedDisciplines = new Set();
+
+/**
+ * Fold a project's raw discipline list into the canonical set: deduplicated,
+ * ordered by DISCIPLINES, with any unmapped value kept verbatim at the end.
+ */
+function normalizeDisciplines(raw) {
+  const canon = new Set();
+  const extras = [];
+  for (const value of raw) {
+    const k = key(value);
+    if (k in DISCIPLINE_MAP) {
+      if (DISCIPLINE_MAP[k]) canon.add(DISCIPLINE_MAP[k]);
+    } else {
+      unmappedDisciplines.add(norm(value));
+      extras.push(norm(value));
+    }
+  }
+  return DISCIPLINES.filter((d) => canon.has(d)).concat(extras);
+}
+
+/**
+ * Display-name patches applied after a sheet is parsed, keyed by its short name
+ * (the part after "N."). The workbook still owns the sheet name and therefore
+ * the slug/URL; this only rewrites what the pages print — here so the Ratchet
+ * builds read as the Transformers fan projects they are. Delete an entry once
+ * the workbook itself carries the name.
+ */
+const NAME_OVERRIDES = {
+  'IDW Ratchet MK1': {
+    short: 'Transformers IDW Ratchet MK1',
+    title: 'Transformers IDW Infiltration Ratchet MK1',
+  },
+  'IDW Ratchet MK2': {
+    short: 'Transformers IDW Ratchet MK2',
+    title: 'Transformers IDW Infiltration Ratchet MK2',
+  },
+};
+
+/**
+ * Longer Role text for the FTC robots, keyed by slug. The one-line workbook
+ * value ("CAD Support, Manufacturing, …") reads as a title list; on a
+ * three-person team the point is that the work is spread across all of it.
+ * Overrides project.role after parsing. Delete an entry once the workbook says
+ * the same.
+ */
+const ROLE_OVERRIDES = {
+  'ftc-decode-sharik':
+    'Ultraviolet is a three-person team, so responsibilities are highly distributed. For this project, I was responsible for prototype design, mechanical design, manufacturing and assembly, and programming support.',
+  'ftc-itd-tuzik':
+    'Ultraviolet is a three-person team, so responsibilities are highly distributed. For this project, I was responsible for CAD support, manufacturing, assembly, and programming.',
+};
+
+/**
+ * One-off copy corrections for text the workbook still has wrong. Each is a
+ * narrow find/replace, so if the workbook is later fixed to match, the replace
+ * just becomes a no-op — delete the line once that happens.
+ */
+
+// Brand spellings and a stray British "modelling". Safe to run over any string,
+// so this also covers the shared section-catalog labels.
+function brandFix(s) {
+  return typeof s === 'string'
+    ? s
+        .replace(/\bLego\b/g, 'LEGO')
+        .replace(/\bBricklink\b/g, 'BrickLink')
+        .replace(/\bTensorflow\b/g, 'TensorFlow')
+        .replace(/Surface Modelling\b/g, 'Surface Modeling')
+    : s;
+}
+
+function fixProjectCopy(project) {
+  project.sheet = brandFix(project.sheet);
+  project.short = brandFix(project.short);
+  project.title = brandFix(project.title);
+  project.projectType = brandFix(project.projectType);
+  for (const o of project.overview) {
+    o.label = brandFix(o.label);
+    o.text = brandFix(o.text);
+  }
+  for (const img of project.images) img.caption = brandFix(img.caption);
+  for (const v of project.videos) v.caption = brandFix(v.caption);
+
+  // Missing space around the slash — every other "School Project / …" has it.
+  if (project.projectType === 'School Project/Structural Model') {
+    project.projectType = 'School Project / Structural Model';
+  }
+
+  for (const o of project.overview) {
+    // Sentence left unfinished in the workbook cell.
+    if (o.text.endsWith('airflow has not caused th')) {
+      o.text += 'ermal issues, and the connector system has remained secure during daily use.';
+    }
+    // Missing comma; also "only has" -> "has only".
+    o.text = o.text.replace(
+      'Each judge only has one such pin to give making it very rare.',
+      'Each judge has only one such pin to give, making it very rare.'
+    );
+    // The puzzle boxes are named "The Keys" and "The Frets"; the prose drifts
+    // to "The Piano" / "The Guitar" in two spots.
+    if (project.slug === 'piano-puzzle-box' || project.slug === 'guitar-puzzle-box') {
+      o.text = o.text.replace(/\bThe Piano\b/g, 'The Keys').replace(/\bThe Guitar\b/g, 'The Frets');
+    }
+  }
+}
+
+/**
  * "1A. MK2 Modular Chassis" -> { number: 1, variant: 'A', short: 'MK2 Modular Chassis' }
  * "2. MK1 Modular Chassis"  -> { number: 2, variant: '',  short: 'MK1 Modular Chassis' }
  * "Loose Sheet"             -> { number: null, variant: '', short: 'Loose Sheet' }
@@ -219,9 +396,12 @@ function buildProject(sheetName, pairs, availableImages, catalog) {
     if (!k || SEPARATORS.has(k)) continue;
 
     if (k in KNOWN_FIELDS) {
-      project[KNOWN_FIELDS[k]] = LIST_FIELDS.has(k)
-        ? value.split(',').map(norm).filter(Boolean)
-        : value;
+      if (!LIST_FIELDS.has(k)) {
+        project[KNOWN_FIELDS[k]] = value;
+      } else {
+        const items = value.split(',').map(norm).filter(Boolean);
+        project[KNOWN_FIELDS[k]] = k === 'disciplines' ? normalizeDisciplines(items) : items;
+      }
       continue;
     }
 
@@ -320,6 +500,16 @@ function buildProject(sheetName, pairs, availableImages, catalog) {
         visible: Boolean(id) && !isNotApplicable(url),
       };
     });
+
+  // Rewrite the printed name where the workbook's is short of the real one.
+  // Slug was already fixed from the original short, so URLs are untouched.
+  const override = NAME_OVERRIDES[project.short];
+  if (override) {
+    if (override.short) project.short = override.short;
+    if (override.title) project.title = override.title;
+  }
+  if (ROLE_OVERRIDES[project.slug]) project.role = ROLE_OVERRIDES[project.slug];
+  fixProjectCopy(project);
 
   // A sheet counts as populated once it has a title AND something to show.
   project.populated = Boolean(
@@ -509,6 +699,9 @@ function build() {
 
   const wb = XLSX.read(fs.readFileSync(WORKBOOK), { type: 'buffer' });
   const catalog = collectSectionCatalog(wb);
+  // Correct the shared section labels once, at the source, so both the emitted
+  // catalog and every project's copy pick up the fix (see brandFix).
+  catalog.forEach((c) => { c.label = brandFix(c.label); });
   const projects = wb.SheetNames.map((name) =>
     buildProject(name, readSheetPairs(wb.Sheets[name]), availableImages, catalog)
   );
@@ -534,6 +727,9 @@ function build() {
   return {
     source: path.relative(ROOT, WORKBOOK).replace(/\\/g, '/'),
     projectCount: projects.length,
+    // Sheets sharing a number (1A, 1B, 1C…) are one project: this counts the
+    // distinct projects, where projectCount counts the write-ups / case studies.
+    projectGroupCount: new Set(projects.map((p) => p.groupKey)).size,
     populatedCount: projects.filter((p) => p.populated).length,
     // The catalog is emitted so a reader of the JSON can see the full set of
     // section titles without having to diff two projects against each other.
@@ -555,6 +751,7 @@ function build() {
       uncaptionedSheets: projects
         .filter((p) => p.images.length && !p.images.some((i) => i.caption))
         .map((p) => `${p.sheet.trim()} (${p.images.length} image(s))`),
+      unmappedDisciplines: [...unmappedDisciplines].sort((a, b) => a.localeCompare(b)),
       pathLikeSections: projects.flatMap((p) =>
         p.overview
           .filter((o) => o.visible && looksLikePath(o.text))
@@ -616,6 +813,10 @@ if (data.warnings.unparsedVideos.length) {
 if (data.warnings.uncaptionedSheets.length) {
   console.log(`  ! ${data.warnings.uncaptionedSheets.length} sheet(s) with images but no "Image N Caption" rows:`);
   for (const m of data.warnings.uncaptionedSheets) console.log(`      ${m}`);
+}
+if (data.warnings.unmappedDisciplines.length) {
+  console.log(`  ! ${data.warnings.unmappedDisciplines.length} discipline(s) not in the canonical map — kept verbatim:`);
+  for (const m of data.warnings.unmappedDisciplines) console.log(`      ${m}`);
 }
 if (data.about) {
   console.log(`  ${data.about.source} -> about page: ${data.about.sections.length} section(s)`);

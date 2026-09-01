@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
-import { projects, projectCount, aboutSections, AUTHOR, SITE_TITLE } from '../lib/projects.js';
+import { projects, projectCount, projectGroupCount, aboutSections, AUTHOR, SITE_TITLE } from '../lib/projects.js';
 import { url } from '../lib/url.js';
 
 // Every word below comes from the "About Me" sheet of additional-info.xlsx —
@@ -63,16 +63,16 @@ const method = [
       <div class="container mx-auto px-4">
         <div class="max-w-3xl mx-auto grid grid-cols-3 gap-6 text-center">
           <div>
-            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{projectCount}</p>
+            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{projectGroupCount}</p>
             <p class="text-gray-400 text-xs sm:text-sm mt-2">Projects</p>
+          </div>
+          <div>
+            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{projectCount}</p>
+            <p class="text-gray-400 text-xs sm:text-sm mt-2">Case Studies</p>
           </div>
           <div>
             <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{disciplines.length}</p>
             <p class="text-gray-400 text-xs sm:text-sm mt-2">Disciplines</p>
-          </div>
-          <div>
-            <p class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">{tools.length}</p>
-            <p class="text-gray-400 text-xs sm:text-sm mt-2">Tools</p>
           </div>
         </div>
       </div>

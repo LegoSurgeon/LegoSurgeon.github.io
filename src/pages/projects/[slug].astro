@@ -6,9 +6,9 @@ import VideoOverlay from '../../components/VideoOverlay.astro';
 import {
   projects, projectCode, projectTitle, projectHref,
   sectionsOf, videosOf, blurbOf,
-  variantsOf, parentOf, neighborsOf, SITE_TITLE, AUTHOR,
+  variantsOf, parentOf, seeAlsoOf, neighborsOf, SITE_TITLE, AUTHOR,
 } from '../../lib/projects.js';
-import { url } from '../../lib/url.js';
+import { url, assetUrl } from '../../lib/url.js';
 import { linkify } from '../../lib/text.js';
 
 // One page per workbook sheet. Adding a tab and re-running `npm run data` adds
@@ -24,6 +24,7 @@ const { project } = Astro.props;
 
 const variants = variantsOf(project);
 const parent = parentOf(project);
+const seeAlso = seeAlsoOf(project);
 const { prev, next } = neighborsOf(project);
 const title = projectTitle(project);
 
@@ -177,6 +178,44 @@ const description = project.populated
                       </p>
                     </div>
                   ))}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <!-- See Also — hand-curated cross-links (see SEE_ALSO in projects.js) -->
+        {seeAlso.length > 0 && (
+          <section class="bg-slate-950 border-t border-white/10 py-14">
+            <div class="container mx-auto px-4">
+              <div class="max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6">See Also</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {seeAlso.map((r) => {
+                    const cover = r.images.find((i) => i.exists) ?? null;
+                    return (
+                      <a href={projectHref(r)}
+                        class="group flex items-stretch gap-4 rounded-xl bg-slate-800/40 border border-white/10 overflow-hidden hover:border-purple-400/40 hover:bg-slate-800/70 transition-all duration-300">
+                        <div class="relative w-28 sm:w-32 flex-shrink-0 bg-slate-900">
+                          {cover ? (
+                            <img src={assetUrl(cover.src)} alt={`${projectTitle(r)} — preview`} loading="lazy" decoding="async"
+                              class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                          ) : (
+                            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-purple-900/20 via-slate-900 to-blue-900/20">
+                              <Icon name="image-off" size={20} class="text-white/15" />
+                            </div>
+                          )}
+                        </div>
+                        <div class="flex items-center gap-3 flex-1 min-w-0 py-4 pr-4">
+                          <span class="font-mono text-xs font-bold px-2 py-1 rounded-md bg-purple-500/15 border border-purple-400/30 text-purple-300 flex-shrink-0">
+                            {projectCode(r)}
+                          </span>
+                          <span class="flex-1 min-w-0 text-white font-semibold group-hover:text-purple-300 transition-colors truncate">{projectTitle(r)}</span>
+                          <Icon name="arrow-right" size={18} class="text-purple-400 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             </div>

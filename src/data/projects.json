@@ -1,6 +1,7 @@
 {
   "source": "data/Engineering Portfolio.xlsx",
   "projectCount": 25,
+  "projectGroupCount": 16,
   "populatedCount": 25,
   "sectionCatalog": [
     "What it is",
@@ -11,7 +12,7 @@
     "What Changed",
     "What I am Taking Forward",
     "Comic Accuracy & Transformation Packaging",
-    "Surface Modelling & CAD Reconstruction",
+    "Surface Modeling & CAD Reconstruction",
     "Current Development",
     "Voyage to Mechanism Progression",
     "Self-Verifying Sliding Map Puzzle",
@@ -45,7 +46,7 @@
     "Form, Manufacturing, & Assembly",
     "Three Original Designs",
     "Early Transformation Design",
-    "Bricklink Page",
+    "BrickLink Page",
     "Truss Structure & Assembly",
     "Hand Fabrication and Mechanism Development",
     "Accolades",
@@ -60,7 +61,8 @@
         "paragraphs": [
           "I’m Nick, a high school engineering student focused on mechanical design, robotics, mechatronics, and physical product development. I’m most interested in problems where geometry, motion, packaging, manufacturing, electronics, and user experience all have to work together.",
           "I started designing mechanisms long before I had access to CAD or a 3D printer, experimenting with LEGO Transformers, puzzle boxes, and hand-built projects. As my tools improved, those same interests grew into fully original transforming figures, competition robots, custom electronics, mechanical puzzles, and products designed for real users.",
-          "I’m also a member of FIRST Tech Challenge Team 23268 Ultraviolet, a three-person robotics team where I work across CAD, fabrication, assembly, programming, prototyping, and testing. Working on competition robots has taught me that a design is never finished just because it works in CAD; it has to survive manufacturing, real hardware, unpredictable conditions, and the people using it."
+          "I’m also a member of FIRST Tech Challenge Team 23268 Ultraviolet, a three-person robotics team where I work across CAD, fabrication, assembly, programming, prototyping, and testing. Working on competition robots has taught me that a design is never finished just because it works in CAD; it has to survive manufacturing, real hardware, unpredictable conditions, and the people using it.",
+          "Outside engineering, I’m a varsity swimmer and musician, playing saxophone and piano. I also spend a lot of time strength training, something I took up on my own simply because I wanted to become stronger and see how far I could push myself."
         ],
         "items": []
       },
@@ -105,7 +107,7 @@
         ]
       },
       {
-        "label": "What Im working toward",
+        "label": "What I'm working toward",
         "paragraphs": [
           "I don’t know exactly what form my work will take in the future, but I want to keep taking harder physical problems and turning them into systems that are useful, deliberate, and elegantly engineered."
         ],
@@ -128,10 +130,8 @@
       "disciplines": [
         "Mechanical Design",
         "Mechatronics",
-        "PCB Design",
-        "Sensor Integration",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Electronics/PCB",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -181,7 +181,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -351,7 +351,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -426,10 +426,8 @@
       "disciplines": [
         "Mechanical Design",
         "Mechatronics",
-        "PCB Design",
-        "Sensor Integration",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Electronics/PCB",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -479,7 +477,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -649,7 +647,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -711,9 +709,7 @@
       "disciplines": [
         "Mechanical Design",
         "Mechatronics",
-        "Sensor Integration",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -762,7 +758,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -932,7 +928,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -1008,10 +1004,8 @@
       "disciplines": [
         "Mechanical Design",
         "Mechatronics",
-        "PCB Design",
-        "Sensor Integration",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Electronics/PCB",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -1061,7 +1055,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -1231,7 +1225,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -1300,10 +1294,8 @@
       "disciplines": [
         "Mechanical Design",
         "Mechatronics",
-        "PCB Design",
-        "Sensor Integration",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Electronics/PCB",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -1353,7 +1345,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -1523,7 +1515,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -1620,10 +1612,8 @@
       "disciplines": [
         "Mechanical Design",
         "Mechatronics",
-        "PCB Design",
-        "Sensor Integration",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Electronics/PCB",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -1673,7 +1663,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -1843,7 +1833,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -1930,19 +1920,17 @@
       "sheet": "2. IDW Ratchet MK2",
       "number": 2,
       "variant": "",
-      "short": "IDW Ratchet MK2",
+      "short": "Transformers IDW Ratchet MK2",
       "slug": "idw-ratchet-mk2",
-      "title": "IDW Infiltration Ratchet MK2",
+      "title": "Transformers IDW Infiltration Ratchet MK2",
       "status": "In Development",
       "year": "2026",
       "projectType": "Transforming Figure / Mechanical Product Design",
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Kinematics",
-        "Spatial Packaging",
-        "Surface Modeling",
-        "Character Adaptation",
+        "Product Design",
+        "CAD",
         "Rapid Prototyping"
       ],
       "tools": [
@@ -1982,7 +1970,7 @@
           "visible": true
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "Achieving the comic’s smooth, rounded forms has also required a different CAD workflow from the more geometric MK1 design. Some organic components were initially shaped in Blender and brought into Fusion 360, but mesh-based geometry created visible faceting and was not ideal for a model intended to become a manufacturable mechanical assembly. For areas such as the knee armor, I rebuilt the geometry using controlled patches and lofted surfaces in Fusion rather than relying on the original mesh. This required substantially more work but produced smooth, editable surfaces that integrate cleanly with joints and surrounding components. The project has therefore become as much an exercise in surface quality and manufacturable form development as it is in transformation design.",
           "visible": true
         },
@@ -2162,7 +2150,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -2313,10 +2301,7 @@
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Puzzle Design",
-        "Sequential Mechanisms",
-        "Product Design",
-        "User Experience"
+        "Product Design"
       ],
       "tools": [
         "Fusion 360",
@@ -2389,7 +2374,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -2534,7 +2519,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -2616,10 +2601,8 @@
       "role": "Sole chassis designer",
       "disciplines": [
         "Mechanical Design",
-        "Modular Robotics",
-        "Packaging",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Robotics",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -2653,7 +2636,7 @@
         },
         {
           "label": "Accolades",
-          "text": "This chassis won a 'You Inspire Me' pin from a judge at the 2026 FTC World Championship. Each judge only has one such pin to give making it very rare.",
+          "text": "This chassis won a 'You Inspire Me' pin from a judge at the 2026 FTC World Championship. Each judge has only one such pin to give, making it very rare.",
           "visible": true
         },
         {
@@ -2672,7 +2655,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -2842,7 +2825,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -2922,10 +2905,8 @@
       "role": "Sole chassis designer",
       "disciplines": [
         "Mechanical Design",
-        "Modular Robotics",
-        "Packaging",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Robotics",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -2973,7 +2954,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -3143,7 +3124,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -3225,10 +3206,8 @@
       "role": "Sole chassis designer",
       "disciplines": [
         "Mechanical Design",
-        "Modular Robotics",
-        "Packaging",
-        "Rapid Prototyping",
-        "Design for Serviceability"
+        "Robotics",
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -3276,7 +3255,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -3446,7 +3425,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -3512,18 +3491,16 @@
       "sheet": "5. IDW Ratchet MK1 ",
       "number": 5,
       "variant": "",
-      "short": "IDW Ratchet MK1",
+      "short": "Transformers IDW Ratchet MK1",
       "slug": "idw-ratchet-mk1",
-      "title": "IDW Infiltration Ratchet MK1",
+      "title": "Transformers IDW Infiltration Ratchet MK1",
       "status": "Completed",
       "year": "2025",
       "projectType": "Transforming Figure / Mechanical Product Design",
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Kinematics",
-        "Spatial Packaging",
-        "Character Adaptation",
+        "Product Design",
         "Rapid Prototyping"
       ],
       "tools": [
@@ -3587,7 +3564,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -3742,7 +3719,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -3858,11 +3835,8 @@
       "projectType": "Robotics / Machine Learning Vision System",
       "role": "Primary Developer",
       "disciplines": [
-        "Machine Learning",
-        "Computer Vision",
-        "Dataset Design",
-        "Robotics Programming",
-        "Testing & Validation"
+        "Robotics",
+        "Computer Vision"
       ],
       "tools": [
         "TensorFlow",
@@ -3932,7 +3906,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -4087,7 +4061,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -4127,7 +4101,7 @@
           "file": "20260819_133552.jpg",
           "src": "/images/20260819_133552.jpg",
           "exists": true,
-          "caption": "Tensorflow Training Graphs"
+          "caption": "TensorFlow Training Graphs"
         }
       ],
       "videos": [],
@@ -4147,13 +4121,12 @@
       "status": "Completed",
       "year": "2025",
       "projectType": "FTC Competition Robot",
-      "role": "Prototype Designer, Mechanical Designer, Manufacturing & Assembly, Programming Support",
+      "role": "Ultraviolet is a three-person team, so responsibilities are highly distributed. For this project, I was responsible for prototype design, mechanical design, manufacturing and assembly, and programming support.",
       "disciplines": [
-        "Robotics",
         "Mechanical Design",
-        "Rapid Prototyping",
+        "Robotics",
         "Manufacturing",
-        "Testing & Iteration"
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -4229,7 +4202,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -4384,7 +4357,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -4446,14 +4419,12 @@
       "status": "completed",
       "year": "2024",
       "projectType": "FTC Competition Robot",
-      "role": "CAD Support, Manufacturing, Assembly & Programming",
+      "role": "Ultraviolet is a three-person team, so responsibilities are highly distributed. For this project, I was responsible for CAD support, manufacturing, assembly, and programming.",
       "disciplines": [
         "Robotics",
         "CAD",
-        "Rapid Prototyping",
         "Computer Vision",
-        "Autonomous Programming",
-        "Testing"
+        "Rapid Prototyping"
       ],
       "tools": [
         "Fusion 360",
@@ -4528,7 +4499,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -4683,7 +4654,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -4755,9 +4726,7 @@
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Puzzle Design",
         "Product Design",
-        "User Experience",
         "Rapid Prototyping"
       ],
       "tools": [
@@ -4816,7 +4785,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -4976,7 +4945,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -5061,9 +5030,7 @@
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Puzzle Design",
         "Product Design",
-        "User Experience",
         "Rapid Prototyping"
       ],
       "tools": [
@@ -5103,7 +5070,7 @@
         },
         {
           "label": "Shared Packaging and reward system",
-          "text": "Like the other puzzles in the series, The Piano includes the same reward concept and modular display system. The packaging also keeps the same overall dimensions so the products feel related, even though the external identity changes through the logo and the puzzle form itself. Using the same packaging and reward structure helped me focus this design on what changed: the puzzle body, the solving sequence, and the intended difficulty. It also made the series feel more like a coherent line of products rather than unrelated one-off puzzle boxes.",
+          "text": "Like the other puzzles in the series, The Keys includes the same reward concept and modular display system. The packaging also keeps the same overall dimensions so the products feel related, even though the external identity changes through the logo and the puzzle form itself. Using the same packaging and reward structure helped me focus this design on what changed: the puzzle body, the solving sequence, and the intended difficulty. It also made the series feel more like a coherent line of products rather than unrelated one-off puzzle boxes.",
           "visible": true
         },
         {
@@ -5122,7 +5089,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -5282,7 +5249,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -5364,9 +5331,7 @@
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Puzzle Design",
         "Product Design",
-        "User Experience",
         "Rapid Prototyping"
       ],
       "tools": [
@@ -5401,7 +5366,7 @@
         },
         {
           "label": "Nine-Step puzzle sequence",
-          "text": "Like The Piano, The Guitar uses a nine-step sequence, but it is the hardest puzzle in the series. I increased the difficulty further for this version so the solving experience would feel more substantial for its intended recipient. Because the outer form was based on a specific guitar, the mechanism sequence had to fit around recognizable body and neck geometry rather than inside a simple box. That made the internal packaging challenge more demanding while also giving the final puzzle a much stronger identity.",
+          "text": "Like The Keys, The Frets uses a nine-step sequence, but it is the hardest puzzle in the series. I increased the difficulty further for this version so the solving experience would feel more substantial for its intended recipient. Because the outer form was based on a specific guitar, the mechanism sequence had to fit around recognizable body and neck geometry rather than inside a simple box. That made the internal packaging challenge more demanding while also giving the final puzzle a much stronger identity.",
           "visible": true
         },
         {
@@ -5425,7 +5390,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -5585,7 +5550,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -5674,9 +5639,8 @@
       "role": "System Design, CAD, Electronics Integration",
       "disciplines": [
         "Mechatronics",
-        "Embedded Programming",
-        "Sensor Integration",
-        "Product Design"
+        "Product Design",
+        "Embedded Systems"
       ],
       "tools": [
         "Fusion 360",
@@ -5742,7 +5706,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -5897,7 +5861,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -5959,9 +5923,7 @@
       "disciplines": [
         "Product Design",
         "CAD",
-        "FDM Manufacturing",
-        "Design for Assembly",
-        "Thermal Consideration"
+        "Manufacturing"
       ],
       "tools": [
         "Fusion 360",
@@ -6001,7 +5963,7 @@
         },
         {
           "label": "Manufacturing & Real-World Use",
-          "text": "The final design consists of only two ABS components printed on a Bambu X1C: the main stand and connector arm. The main stand fit correctly on its first physical iteration, including the close-fit computer cradle. Three completed stands have been connected together and used continuously for several months. The computers remain stable and easy to remove, all ports remain accessible, airflow has not caused th",
+          "text": "The final design consists of only two ABS components printed on a Bambu X1C: the main stand and connector arm. The main stand fit correctly on its first physical iteration, including the close-fit computer cradle. Three completed stands have been connected together and used continuously for several months. The computers remain stable and easy to remove, all ports remain accessible, airflow has not caused thermal issues, and the connector system has remained secure during daily use.",
           "visible": true
         },
         {
@@ -6020,7 +5982,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -6180,7 +6142,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -6269,9 +6231,7 @@
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Product Design",
-        "Clamping Mechanisms",
-        "Design for User Protection"
+        "Product Design"
       ],
       "tools": [
         "Fusion 360",
@@ -6329,7 +6289,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -6489,7 +6449,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -6551,7 +6511,7 @@
       "disciplines": [
         "Product Design",
         "CAD",
-        "Design for Manufacturing",
+        "Manufacturing",
         "Rapid Prototyping"
       ],
       "tools": [
@@ -6610,7 +6570,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -6775,7 +6735,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -6833,20 +6793,19 @@
       "variantSlugs": []
     },
     {
-      "sheet": "14. Lego Transformers ",
+      "sheet": "14. LEGO Transformers ",
       "number": 14,
       "variant": "",
-      "short": "Lego Transformers",
+      "short": "LEGO Transformers",
       "slug": "lego-transformers",
-      "title": "Original Lego Transformers: Overhaul, Liftor & Cargo",
+      "title": "Original LEGO Transformers: Overhaul, Liftor & Cargo",
       "status": "Completed",
       "year": "2023",
       "projectType": "Transforming Models / Early Mechanical Design",
       "role": "Sole Designer",
       "disciplines": [
-        "Transformation Design",
-        "Spatial Packaging",
-        "LEGO Technic/System Building"
+        "Mechanical Design",
+        "Product Design"
       ],
       "tools": [
         "LEGO",
@@ -6889,8 +6848,8 @@
           "visible": true
         },
         {
-          "label": "Bricklink Page",
-          "text": "Here is the link to my Lego Bricklink page which contains each of these models with descriptions and additional images as well as transformation sequences: https://www.bricklink.com/v3/studio/public_gallery.page?idUser=3040757",
+          "label": "BrickLink Page",
+          "text": "Here is the link to my LEGO BrickLink page which contains each of these models with descriptions and additional images as well as transformation sequences: https://www.bricklink.com/v3/studio/public_gallery.page?idUser=3040757",
           "visible": true
         },
         {
@@ -6909,7 +6868,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -7121,13 +7080,12 @@
       "title": "Wooden Truss Bridge",
       "status": "Completed",
       "year": "2021",
-      "projectType": "School Project/Structural Model",
+      "projectType": "School Project / Structural Model",
       "role": "Sole Designer and Builder",
       "disciplines": [
-        "Structural Design",
+        "Mechanical Design",
         "CAD",
-        "Fabrication",
-        "Assembly Planning"
+        "Manufacturing"
       ],
       "tools": [
         "CAD",
@@ -7185,7 +7143,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -7355,7 +7313,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -7413,9 +7371,7 @@
       "role": "Sole Designer",
       "disciplines": [
         "Mechanical Design",
-        "Hand Fabrication",
-        "Mechanism Design",
-        "Structural Assembly"
+        "Manufacturing"
       ],
       "tools": [
         "Hand-Drafted Blueprint",
@@ -7473,7 +7429,7 @@
           "visible": false
         },
         {
-          "label": "Surface Modelling & CAD Reconstruction",
+          "label": "Surface Modeling & CAD Reconstruction",
           "text": "N/A",
           "visible": false
         },
@@ -7643,7 +7599,7 @@
           "visible": false
         },
         {
-          "label": "Bricklink Page",
+          "label": "BrickLink Page",
           "text": "N/A",
           "visible": false
         },
@@ -7702,10 +7658,11 @@
     ],
     "unparsedVideos": [],
     "uncaptionedSheets": [],
+    "unmappedDisciplines": [],
     "pathLikeSections": [],
     "fallbackPosters": [],
     "about": [
-      "\"About Me\" → What Im working toward: dropped a drafting note left in the cell"
+      "additional-info.xlsx not present — kept the about content already in projects.json"
     ]
   }
 }
